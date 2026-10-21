@@ -94,7 +94,7 @@ public class InsuranceJourneyService {
                 JourneyStep.INSURANCE_BIND,
                 settings -> policies.create(command, settings.defaultPolicyStatus())
                         .flatMap(record -> kitDocumentsApi.issue("letter", partyId, record.id(), record.id().toString())
-                                .thenReturn(record)));
+                                .map(record::withDocument)));
     }
 
     public Mono<InsuranceRecord> readPolicy(UUID policyId) {

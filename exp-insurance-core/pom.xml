@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.fireflysoftware</groupId>
         <artifactId>exp-insurance</artifactId>
-        <version>26.10.3</version>
+        <version>26.10.4</version>
     </parent>
 
     <artifactId>exp-insurance-core</artifactId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-common-contracts-sdk</artifactId>
-            <version>26.10.3</version>
+            <version>26.10.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

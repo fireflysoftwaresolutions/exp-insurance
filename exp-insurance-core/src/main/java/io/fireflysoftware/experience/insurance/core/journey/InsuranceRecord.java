@@ -25,5 +25,12 @@ import java.util.UUID;
  * @param reference business number
  * @param status    status name returned by the domain
  */
-public record InsuranceRecord(UUID id, String reference, String status) {
+public record InsuranceRecord(UUID id, String reference, String status, UUID documentId) {
+    public InsuranceRecord(UUID id, String reference, String status) {
+        this(id, reference, status, null);
+    }
+
+    public InsuranceRecord withDocument(UUID documentId) {
+        return new InsuranceRecord(id, reference, status, documentId);
+    }
 }
