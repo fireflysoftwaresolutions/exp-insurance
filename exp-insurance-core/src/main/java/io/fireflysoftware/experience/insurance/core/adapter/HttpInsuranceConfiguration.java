@@ -161,6 +161,7 @@ public class HttpInsuranceConfiguration {
         public Mono<InsuranceRecord> create(PolicyCommand command, PolicyStatus defaultStatus) {
             require(command.tenantId(), "tenantId");
             require(command.contractId(), "contractId");
+            require(command.partyId(), "partyId");
             require(command.productId(), "productId");
             requireText(command.policyNumber(), "policyNumber");
             require(command.lineOfBusiness(), "lineOfBusiness");
@@ -170,6 +171,7 @@ public class HttpInsuranceConfiguration {
             Map<String, Object> body = new LinkedHashMap<>();
             body.put("tenantId", command.tenantId());
             body.put("contractId", command.contractId());
+            body.put("partyId", command.partyId());
             body.put("productId", command.productId());
             body.put("policyNumber", command.policyNumber());
             body.put("lineOfBusiness", command.lineOfBusiness().name());
