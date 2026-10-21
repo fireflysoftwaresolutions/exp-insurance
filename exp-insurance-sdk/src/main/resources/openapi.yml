@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Experience Insurance API
   description: Customer journey for quote, bind, claim, and the servicing sagas those domains already expose.
-  version: 26.10.4
+  version: 26.10.5
 paths:
   /api/v1/experience/insurance/quotes:
     post:
