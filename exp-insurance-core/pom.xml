@@ -23,6 +23,21 @@
             <version>26.10.4</version>
         </dependency>
         <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>domain-insurance-underwriting-sdk</artifactId>
+            <version>26.10.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>domain-insurance-policies-sdk</artifactId>
+            <version>26.10.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>domain-insurance-claims-sdk</artifactId>
+            <version>26.10.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>

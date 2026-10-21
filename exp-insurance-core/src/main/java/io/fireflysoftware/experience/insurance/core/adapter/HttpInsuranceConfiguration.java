@@ -17,6 +17,12 @@
 
 package io.fireflysoftware.experience.insurance.core.adapter;
 
+import io.fireflysoftware.domain.insurance.claims.sdk.api.ClaimsApi;
+import io.fireflysoftware.domain.insurance.claims.sdk.model.ClaimDTO;
+import io.fireflysoftware.domain.insurance.policies.sdk.api.PoliciesApi;
+import io.fireflysoftware.domain.insurance.policies.sdk.model.PolicyDTO;
+import io.fireflysoftware.domain.insurance.underwriting.sdk.api.UnderwritingApi;
+import io.fireflysoftware.domain.insurance.underwriting.sdk.model.SubmissionDTO;
 import io.fireflysoftware.experience.insurance.core.journey.ClaimCommand;
 import io.fireflysoftware.experience.insurance.core.journey.ClaimPort;
 import io.fireflysoftware.experience.insurance.core.journey.ClaimStatus;
@@ -29,21 +35,17 @@ import io.fireflysoftware.experience.insurance.core.journey.SubmissionStatus;
 import io.fireflysoftware.experience.insurance.core.journey.UnderwritingPort;
 import org.fireflyframework.web.error.exceptions.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 /**
- * HTTP adapters for the insurance domain sagas. A future BPM replaces these beans.
- * This configuration does not import a core SDK, a domain workflow, or Keycloak.
+ * Quote, bind, and claim calls go through the insurance domain SDKs.
  */
 @Configuration
 public class HttpInsuranceConfiguration {
@@ -52,29 +54,38 @@ public class HttpInsuranceConfiguration {
     public UnderwritingPort underwritingPort(
             @Value("${api-configuration.domain-platform.insurance-underwriting.base-path:http://localhost:8073}")
             String basePath) {
-        return new HttpUnderwritingClient(WebClient.builder().baseUrl(basePath).build());
+        io.fireflysoftware.domain.insurance.underwriting.sdk.invoker.ApiClient client =
+                new io.fireflysoftware.domain.insurance.underwriting.sdk.invoker.ApiClient();
+        client.setBasePath(basePath);
+        return new HttpUnderwritingClient(new UnderwritingApi(client));
     }
 
     @Bean
     public PolicyPort policyPort(
             @Value("${api-configuration.domain-platform.insurance-policies.base-path:http://localhost:8071}")
             String basePath) {
-        return new HttpPolicyClient(WebClient.builder().baseUrl(basePath).build());
+        io.fireflysoftware.domain.insurance.policies.sdk.invoker.ApiClient client =
+                new io.fireflysoftware.domain.insurance.policies.sdk.invoker.ApiClient();
+        client.setBasePath(basePath);
+        return new HttpPolicyClient(new PoliciesApi(client));
     }
 
     @Bean
     public ClaimPort claimPort(
             @Value("${api-configuration.domain-platform.insurance-claims.base-path:http://localhost:8072}")
             String basePath) {
-        return new HttpClaimClient(WebClient.builder().baseUrl(basePath).build());
+        io.fireflysoftware.domain.insurance.claims.sdk.invoker.ApiClient client =
+                new io.fireflysoftware.domain.insurance.claims.sdk.invoker.ApiClient();
+        client.setBasePath(basePath);
+        return new HttpClaimClient(new ClaimsApi(client));
     }
 
     public static final class HttpUnderwritingClient implements UnderwritingPort {
 
-        private final WebClient webClient;
+        private final UnderwritingApi underwriting;
 
-        public HttpUnderwritingClient(WebClient webClient) {
-            this.webClient = webClient;
+        public HttpUnderwritingClient(UnderwritingApi underwriting) {
+            this.underwriting = underwriting;
         }
 
         @Override
@@ -86,75 +97,68 @@ public class HttpInsuranceConfiguration {
             require(command.lineOfBusiness(), "lineOfBusiness");
             SubmissionStatus status = command.submissionStatus() != null ? command.submissionStatus() : defaultStatus;
             require(status, "submissionStatus");
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tenantId", command.tenantId());
-            body.put("partyId", command.partyId());
-            body.put("productId", command.productId());
-            body.put("submissionNumber", command.submissionNumber());
-            body.put("lineOfBusiness", command.lineOfBusiness().name());
-            body.put("submissionStatus", status.name());
-            body.put("receivedAt", Instant.now().toString());
+            SubmissionDTO body = new SubmissionDTO()
+                    .tenantId(command.tenantId())
+                    .partyId(command.partyId())
+                    .productId(command.productId())
+                    .submissionNumber(command.submissionNumber())
+                    .lineOfBusiness(SubmissionDTO.LineOfBusinessEnum.fromValue(command.lineOfBusiness().name()))
+                    .submissionStatus(SubmissionDTO.SubmissionStatusEnum.fromValue(status.name()))
+                    .receivedAt(LocalDateTime.now(ZoneOffset.UTC));
             if (command.currency() != null) {
-                body.put("currency", command.currency());
+                body.currency(command.currency());
             }
-            return post("/api/v1/submissions", body, "submissionId", "submissionNumber", "submissionStatus");
+            return underwriting.create(body, key()).map(HttpInsuranceConfiguration::submission);
         }
 
         @Override
         public Mono<InsuranceRecord> get(UUID submissionId) {
-            return read("/api/v1/submissions/" + submissionId, "submissionId", "submissionNumber", "submissionStatus");
+            return underwriting.get(submissionId, key()).map(HttpInsuranceConfiguration::submission);
         }
 
         @Override
         public Mono<InsuranceRecord> update(UUID submissionId, QuoteCommand command) {
             require(command.lineOfBusiness(), "lineOfBusiness");
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tenantId", command.tenantId());
-            body.put("partyId", command.partyId());
-            body.put("productId", command.productId());
-            body.put("submissionNumber", command.submissionNumber());
-            body.put("lineOfBusiness", command.lineOfBusiness().name());
+            SubmissionDTO body = new SubmissionDTO()
+                    .tenantId(command.tenantId())
+                    .partyId(command.partyId())
+                    .productId(command.productId())
+                    .submissionNumber(command.submissionNumber())
+                    .lineOfBusiness(SubmissionDTO.LineOfBusinessEnum.fromValue(command.lineOfBusiness().name()))
+                    .receivedAt(LocalDateTime.now(ZoneOffset.UTC));
             if (command.submissionStatus() != null) {
-                body.put("submissionStatus", command.submissionStatus().name());
+                body.submissionStatus(SubmissionDTO.SubmissionStatusEnum.fromValue(command.submissionStatus().name()));
             }
             if (command.currency() != null) {
-                body.put("currency", command.currency());
+                body.currency(command.currency());
             }
-            return put("/api/v1/submissions/" + submissionId, body, "submissionId", "submissionNumber", "submissionStatus");
+            return underwriting.update(submissionId, body, key()).map(HttpInsuranceConfiguration::submission);
         }
 
         @Override
         public Mono<InsuranceRecord> status(UUID submissionId, SubmissionStatus status, String reason) {
             require(status, "submissionStatus");
-            return put("/api/v1/submissions/" + submissionId + "/status", statusBody(status, reason),
-                    "submissionId", "submissionNumber", "submissionStatus");
+            io.fireflysoftware.domain.insurance.underwriting.sdk.model.StatusChangeRequest request =
+                    new io.fireflysoftware.domain.insurance.underwriting.sdk.model.StatusChangeRequest()
+                            .status(status.name())
+                            .statusReason(reason);
+            return underwriting.updateStatus(submissionId, request, key()).map(HttpInsuranceConfiguration::submission);
         }
 
         @Override
         public Mono<InsuranceRecord> withdraw(UUID submissionId, String reason) {
-            return post("/api/v1/submissions/" + submissionId + "/withdraw", reasonBody(reason),
-                    "submissionId", "submissionNumber", "submissionStatus");
-        }
-
-        private Mono<InsuranceRecord> post(String path, Map<String, Object> body, String id, String ref, String status) {
-            return exchange(webClient.post().uri(path).bodyValue(body), id, ref, status);
-        }
-
-        private Mono<InsuranceRecord> put(String path, Map<String, Object> body, String id, String ref, String status) {
-            return exchange(webClient.put().uri(path).bodyValue(body), id, ref, status);
-        }
-
-        private Mono<InsuranceRecord> read(String path, String id, String ref, String status) {
-            return exchange(webClient.get().uri(path), id, ref, status);
+            io.fireflysoftware.domain.insurance.underwriting.sdk.model.ReasonRequest request =
+                    new io.fireflysoftware.domain.insurance.underwriting.sdk.model.ReasonRequest().statusReason(reason);
+            return underwriting.withdraw(submissionId, request, key()).map(HttpInsuranceConfiguration::submission);
         }
     }
 
     public static final class HttpPolicyClient implements PolicyPort {
 
-        private final WebClient webClient;
+        private final PoliciesApi policies;
 
-        public HttpPolicyClient(WebClient webClient) {
-            this.webClient = webClient;
+        public HttpPolicyClient(PoliciesApi policies) {
+            this.policies = policies;
         }
 
         @Override
@@ -168,74 +172,59 @@ public class HttpInsuranceConfiguration {
             require(command.inceptionDate(), "inceptionDate");
             PolicyStatus status = command.policyStatus() != null ? command.policyStatus() : defaultStatus;
             require(status, "policyStatus");
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tenantId", command.tenantId());
-            body.put("contractId", command.contractId());
-            body.put("partyId", command.partyId());
-            body.put("productId", command.productId());
-            body.put("policyNumber", command.policyNumber());
-            body.put("lineOfBusiness", command.lineOfBusiness().name());
-            body.put("policyStatus", status.name());
-            body.put("inceptionDate", command.inceptionDate().toString());
-            if (command.expiryDate() != null) {
-                body.put("expiryDate", command.expiryDate().toString());
-            }
-            if (command.currency() != null) {
-                body.put("currency", command.currency());
-            }
-            return exchange(webClient.post().uri("/api/v1/policies").bodyValue(body),
-                    "policyId", "policyNumber", "policyStatus");
+            PolicyDTO body = policy(command, status);
+            return policies.create(body, key()).map(HttpInsuranceConfiguration::policy);
         }
 
         @Override
         public Mono<InsuranceRecord> get(UUID policyId) {
-            return exchange(webClient.get().uri("/api/v1/policies/" + policyId),
-                    "policyId", "policyNumber", "policyStatus");
+            return policies.get(policyId, key()).map(HttpInsuranceConfiguration::policy);
         }
 
         @Override
         public Mono<InsuranceRecord> update(UUID policyId, PolicyCommand command) {
             require(command.lineOfBusiness(), "lineOfBusiness");
-            Map<String, Object> body = basePolicy(command);
-            return exchange(webClient.put().uri("/api/v1/policies/" + policyId).bodyValue(body),
-                    "policyId", "policyNumber", "policyStatus");
+            return policies.update(policyId, policy(command, command.policyStatus()), key())
+                    .map(HttpInsuranceConfiguration::policy);
         }
 
         @Override
         public Mono<InsuranceRecord> status(UUID policyId, PolicyStatus status, String reason) {
             require(status, "policyStatus");
-            return exchange(webClient.put().uri("/api/v1/policies/" + policyId + "/status")
-                            .bodyValue(statusBody(status, reason)),
-                    "policyId", "policyNumber", "policyStatus");
+            io.fireflysoftware.domain.insurance.policies.sdk.model.StatusChangeRequest request =
+                    new io.fireflysoftware.domain.insurance.policies.sdk.model.StatusChangeRequest()
+                            .status(status.name())
+                            .statusReason(reason);
+            return policies.updateStatus(policyId, request, key()).map(HttpInsuranceConfiguration::policy);
         }
 
         @Override
         public Mono<InsuranceRecord> cancel(UUID policyId, String reason) {
-            return exchange(webClient.post().uri("/api/v1/policies/" + policyId + "/cancel")
-                            .bodyValue(reasonBody(reason)),
-                    "policyId", "policyNumber", "policyStatus");
+            io.fireflysoftware.domain.insurance.policies.sdk.model.ReasonRequest request =
+                    new io.fireflysoftware.domain.insurance.policies.sdk.model.ReasonRequest().statusReason(reason);
+            return policies.cancel(policyId, request, key()).map(HttpInsuranceConfiguration::policy);
         }
 
-        private static Map<String, Object> basePolicy(PolicyCommand command) {
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tenantId", command.tenantId());
-            body.put("contractId", command.contractId());
-            body.put("productId", command.productId());
-            body.put("policyNumber", command.policyNumber());
+        private static PolicyDTO policy(PolicyCommand command, PolicyStatus status) {
+            PolicyDTO body = new PolicyDTO()
+                    .tenantId(command.tenantId())
+                    .contractId(command.contractId())
+                    .productId(command.productId())
+                    .policyNumber(command.policyNumber());
             if (command.lineOfBusiness() != null) {
-                body.put("lineOfBusiness", command.lineOfBusiness().name());
+                body.lineOfBusiness(PolicyDTO.LineOfBusinessEnum.fromValue(command.lineOfBusiness().name()));
             }
-            if (command.policyStatus() != null) {
-                body.put("policyStatus", command.policyStatus().name());
+            if (status != null) {
+                body.policyStatus(PolicyDTO.PolicyStatusEnum.fromValue(status.name()));
             }
             if (command.inceptionDate() != null) {
-                body.put("inceptionDate", command.inceptionDate().toString());
+                body.inceptionDate(command.inceptionDate());
             }
             if (command.expiryDate() != null) {
-                body.put("expiryDate", command.expiryDate().toString());
+                body.expiryDate(command.expiryDate());
             }
             if (command.currency() != null) {
-                body.put("currency", command.currency());
+                body.currency(command.currency());
             }
             return body;
         }
@@ -243,10 +232,10 @@ public class HttpInsuranceConfiguration {
 
     public static final class HttpClaimClient implements ClaimPort {
 
-        private final WebClient webClient;
+        private final ClaimsApi claims;
 
-        public HttpClaimClient(WebClient webClient) {
-            this.webClient = webClient;
+        public HttpClaimClient(ClaimsApi claims) {
+            this.claims = claims;
         }
 
         @Override
@@ -258,105 +247,80 @@ public class HttpInsuranceConfiguration {
             require(command.notifiedAt(), "notifiedAt");
             ClaimStatus status = command.claimStatus() != null ? command.claimStatus() : defaultStatus;
             require(status, "claimStatus");
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tenantId", command.tenantId());
-            body.put("policyId", command.policyId());
-            body.put("claimNumber", command.claimNumber());
-            body.put("claimStatus", status.name());
-            body.put("lossDate", command.lossDate().toString());
-            body.put("notifiedAt", command.notifiedAt().toString());
-            if (command.causeCode() != null) {
-                body.put("causeCode", command.causeCode());
-            }
-            if (command.description() != null) {
-                body.put("description", command.description());
-            }
-            if (command.currency() != null) {
-                body.put("currency", command.currency());
-            }
-            return exchange(webClient.post().uri("/api/v1/claims").bodyValue(body),
-                    "claimId", "claimNumber", "claimStatus");
+            return claims.create(claim(command, status), key()).map(HttpInsuranceConfiguration::claim);
         }
 
         @Override
         public Mono<InsuranceRecord> get(UUID claimId) {
-            return exchange(webClient.get().uri("/api/v1/claims/" + claimId),
-                    "claimId", "claimNumber", "claimStatus");
+            return claims.get(claimId, key()).map(HttpInsuranceConfiguration::claim);
         }
 
         @Override
         public Mono<InsuranceRecord> update(UUID claimId, ClaimCommand command) {
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tenantId", command.tenantId());
-            body.put("policyId", command.policyId());
-            body.put("claimNumber", command.claimNumber());
-            if (command.claimStatus() != null) {
-                body.put("claimStatus", command.claimStatus().name());
-            }
-            if (command.lossDate() != null) {
-                body.put("lossDate", command.lossDate().toString());
-            }
-            if (command.notifiedAt() != null) {
-                body.put("notifiedAt", command.notifiedAt().toString());
-            }
-            if (command.description() != null) {
-                body.put("description", command.description());
-            }
-            return exchange(webClient.put().uri("/api/v1/claims/" + claimId).bodyValue(body),
-                    "claimId", "claimNumber", "claimStatus");
+            return claims.update(claimId, claim(command, command.claimStatus()), key()).map(HttpInsuranceConfiguration::claim);
         }
 
         @Override
         public Mono<InsuranceRecord> status(UUID claimId, ClaimStatus status, String reason) {
             require(status, "claimStatus");
-            return exchange(webClient.put().uri("/api/v1/claims/" + claimId + "/status")
-                            .bodyValue(statusBody(status, reason)),
-                    "claimId", "claimNumber", "claimStatus");
+            io.fireflysoftware.domain.insurance.claims.sdk.model.StatusChangeRequest request =
+                    new io.fireflysoftware.domain.insurance.claims.sdk.model.StatusChangeRequest()
+                            .status(status.name())
+                            .statusReason(reason);
+            return claims.updateStatus(claimId, request, key()).map(HttpInsuranceConfiguration::claim);
         }
 
         @Override
         public Mono<InsuranceRecord> close(UUID claimId, String reason) {
-            return exchange(webClient.post().uri("/api/v1/claims/" + claimId + "/close")
-                            .bodyValue(reasonBody(reason)),
-                    "claimId", "claimNumber", "claimStatus");
+            io.fireflysoftware.domain.insurance.claims.sdk.model.ReasonRequest request =
+                    new io.fireflysoftware.domain.insurance.claims.sdk.model.ReasonRequest().statusReason(reason);
+            return claims.close(claimId, request, key()).map(HttpInsuranceConfiguration::claim);
+        }
+
+        private static ClaimDTO claim(ClaimCommand command, ClaimStatus status) {
+            ClaimDTO body = new ClaimDTO()
+                    .tenantId(command.tenantId())
+                    .policyId(command.policyId())
+                    .claimNumber(command.claimNumber());
+            if (status != null) {
+                body.claimStatus(ClaimDTO.ClaimStatusEnum.fromValue(status.name()));
+            }
+            if (command.lossDate() != null) {
+                body.lossDate(command.lossDate());
+            }
+            if (command.notifiedAt() != null) {
+                body.notifiedAt(LocalDateTime.ofInstant(command.notifiedAt(), ZoneOffset.UTC));
+            }
+            if (command.causeCode() != null) {
+                body.causeCode(command.causeCode());
+            }
+            if (command.description() != null) {
+                body.description(command.description());
+            }
+            if (command.currency() != null) {
+                body.currency(command.currency());
+            }
+            return body;
         }
     }
 
-    private static Map<String, Object> statusBody(Enum<?> status, String reason) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", status.name());
-        body.put("statusReason", reason);
-        return body;
+    private static InsuranceRecord submission(SubmissionDTO dto) {
+        return new InsuranceRecord(dto.getSubmissionId(), dto.getSubmissionNumber(),
+                dto.getSubmissionStatus() == null ? null : dto.getSubmissionStatus().getValue());
     }
 
-    private static Map<String, Object> reasonBody(String reason) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("statusReason", reason);
-        return body;
+    private static InsuranceRecord policy(PolicyDTO dto) {
+        return new InsuranceRecord(dto.getPolicyId(), dto.getPolicyNumber(),
+                dto.getPolicyStatus() == null ? null : dto.getPolicyStatus().getValue());
     }
 
-    private static final ParameterizedTypeReference<Map<String, Object>> MAP =
-            new ParameterizedTypeReference<>() {
-            };
-
-    private static Mono<InsuranceRecord> exchange(WebClient.RequestHeadersSpec<?> spec,
-                                                  String idField, String referenceField, String statusField) {
-        return spec.retrieve().bodyToMono(MAP)
-                .map(node -> new InsuranceRecord(
-                        uuid(node.get(idField)),
-                        text(node.get(referenceField)),
-                        text(node.get(statusField))));
+    private static InsuranceRecord claim(ClaimDTO dto) {
+        return new InsuranceRecord(dto.getClaimId(), dto.getClaimNumber(),
+                dto.getClaimStatus() == null ? null : dto.getClaimStatus().getValue());
     }
 
-    private static UUID uuid(Object value) {
-        if (value == null || value.toString().isBlank()) {
-            return null;
-        }
-        return UUID.fromString(value.toString());
-    }
-
-    private static String text(Object value) {
-        return value == null ? null : value.toString();
+    private static String key() {
+        return UUID.randomUUID().toString();
     }
 
     private static void require(Object value, String name) {
@@ -370,5 +334,4 @@ public class HttpInsuranceConfiguration {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", name + " is required");
         }
     }
-
 }

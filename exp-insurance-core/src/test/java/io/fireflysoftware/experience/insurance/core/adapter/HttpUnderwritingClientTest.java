@@ -17,38 +17,39 @@
 
 package io.fireflysoftware.experience.insurance.core.adapter;
 
+import io.fireflysoftware.domain.insurance.underwriting.sdk.api.UnderwritingApi;
+import io.fireflysoftware.domain.insurance.underwriting.sdk.model.SubmissionDTO;
 import io.fireflysoftware.experience.insurance.core.journey.LineOfBusiness;
 import io.fireflysoftware.experience.insurance.core.journey.QuoteCommand;
 import io.fireflysoftware.experience.insurance.core.journey.SubmissionStatus;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class HttpUnderwritingClientTest {
 
     @Test
-    void create_postsSubmissionSaga() {
+    void create_callsUnderwritingSdk() {
         UUID submissionId = UUID.randomUUID();
-        WebClient client = WebClient.builder().exchangeFunction(request -> {
-            assertThat(request.method().name()).isEqualTo("POST");
-            assertThat(request.url().getPath()).isEqualTo("/api/v1/submissions");
-            return Mono.just(ClientResponse.create(HttpStatus.CREATED)
-                    .header("Content-Type", "application/json")
-                    .body("{\"submissionId\":\"" + submissionId + "\",\"submissionNumber\":\"Q-1\",\"submissionStatus\":\"RECEIVED\"}")
-                    .build());
-        }).build();
+        UnderwritingApi api = mock(UnderwritingApi.class);
+        SubmissionDTO stored = new SubmissionDTO()
+                .submissionId(submissionId)
+                .submissionNumber("Q-1")
+                .submissionStatus(SubmissionDTO.SubmissionStatusEnum.RECEIVED);
+        when(api.create(any(), any())).thenReturn(Mono.just(stored));
 
         QuoteCommand command = new QuoteCommand(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
                 "Q-1", LineOfBusiness.MOTOR, null, "USD");
 
-        StepVerifier.create(new HttpInsuranceConfiguration.HttpUnderwritingClient(client)
+        StepVerifier.create(new HttpInsuranceConfiguration.HttpUnderwritingClient(api)
                         .create(command, SubmissionStatus.RECEIVED))
                 .assertNext(record -> {
                     assertThat(record.id()).isEqualTo(submissionId);
@@ -56,5 +57,7 @@ class HttpUnderwritingClientTest {
                     assertThat(record.status()).isEqualTo("RECEIVED");
                 })
                 .verifyComplete();
+
+        verify(api).create(any(), any());
     }
 }
