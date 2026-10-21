@@ -18,6 +18,11 @@
             <artifactId>fireflyframework-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>domain-common-contracts-sdk</artifactId>
+            <version>26.10.3</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>

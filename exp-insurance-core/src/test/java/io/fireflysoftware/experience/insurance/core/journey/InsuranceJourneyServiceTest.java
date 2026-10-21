@@ -17,6 +17,7 @@
 
 package io.fireflysoftware.experience.insurance.core.journey;
 
+import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsApi;
 import io.fireflysoftware.experience.insurance.core.ports.AccessDecision;
 import io.fireflysoftware.experience.insurance.core.ports.AccessDeniedException;
 import io.fireflysoftware.experience.insurance.core.ports.AccessPort;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -60,6 +62,7 @@ class InsuranceJourneyServiceTest {
     @Mock private UnderwritingPort underwriting;
     @Mock private PolicyPort policies;
     @Mock private ClaimPort claims;
+    @Mock private KitDocumentsApi kitDocumentsApi;
 
     private InsuranceJourneyService service;
 
@@ -71,8 +74,9 @@ class InsuranceJourneyServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(kitDocumentsApi.issue(any(), any(), any(), any())).thenReturn(Mono.just(UUID.randomUUID()));
         service = new InsuranceJourneyService(identityPort, accessPort, creditReportPort, decisionPort,
-                catalog, underwriting, policies, claims);
+                catalog, underwriting, policies, claims, kitDocumentsApi);
         lenient().when(identityPort.resolve(any())).thenReturn(Mono.just(new SubjectRef(IdentityPort.SAMPLE_ACTOR, "sandbox")));
         lenient().when(accessPort.check(any())).thenReturn(Mono.just(AccessDecision.permit("SANDBOX_GRANT")));
         lenient().when(catalog.current(any())).thenReturn(Mono.just(enabled));
@@ -136,6 +140,7 @@ class InsuranceJourneyServiceTest {
 
         verify(decisionPort).decide(org.mockito.ArgumentMatchers.argThat(request ->
                 request.journeyStep() == JourneyStep.INSURANCE_BIND));
+        verify(kitDocumentsApi).issue(eq("letter"), any(), any(), any());
     }
 
     @Test
