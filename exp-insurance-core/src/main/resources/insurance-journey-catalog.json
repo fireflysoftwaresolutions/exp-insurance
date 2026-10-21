@@ -1,0 +1,23 @@
+{
+  "enabled": [
+    "QUOTE_CREATE",
+    "QUOTE_READ",
+    "QUOTE_UPDATE",
+    "QUOTE_STATUS",
+    "QUOTE_WITHDRAW",
+    "POLICY_CREATE",
+    "POLICY_READ",
+    "POLICY_UPDATE",
+    "POLICY_STATUS",
+    "POLICY_CANCEL",
+    "CLAIM_CREATE",
+    "CLAIM_READ",
+    "CLAIM_UPDATE",
+    "CLAIM_STATUS",
+    "CLAIM_CLOSE"
+  ],
+  "defaultSubmissionStatus": "RECEIVED",
+  "defaultPolicyStatus": "BOUND",
+  "defaultClaimStatus": "NOTIFIED",
+  "products": {}
+}

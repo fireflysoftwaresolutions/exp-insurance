@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: exp-insurance
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+
+server:
+  port: ${SERVER_PORT:8108}
+
+api-configuration:
+  domain-platform:
+    security-center:
+      base-path: ${ENDPOINT_DOMAIN_CORE_SECURITY_CENTER:http://localhost:8085}
+    lending-credit-scoring:
+      base-path: ${ENDPOINT_DOMAIN_LENDING_CREDIT_SCORING:http://localhost:8042}
+    insurance-underwriting:
+      base-path: ${ENDPOINT_DOMAIN_INSURANCE_UNDERWRITING:http://localhost:8073}
+    insurance-policies:
+      base-path: ${ENDPOINT_DOMAIN_INSURANCE_POLICIES:http://localhost:8071}
+    insurance-claims:
+      base-path: ${ENDPOINT_DOMAIN_INSURANCE_CLAIMS:http://localhost:8072}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

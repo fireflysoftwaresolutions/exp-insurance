@@ -1,0 +1,55 @@
+openapi: 3.0.1
+info:
+  title: Experience Insurance API
+  description: Customer journey for quote, bind, claim, and the servicing sagas those domains already expose.
+  version: 26.10.3
+paths:
+  /api/v1/experience/insurance/quotes:
+    post:
+      operationId: createQuote
+      tags: [Quotes]
+      responses:
+        "201":
+          description: Created
+  /api/v1/experience/insurance/policies:
+    post:
+      operationId: bindPolicy
+      tags: [Policies]
+      responses:
+        "201":
+          description: Created
+  /api/v1/experience/insurance/policies/{policyId}/cancel:
+    post:
+      operationId: cancelPolicy
+      tags: [Policies]
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Cancelled
+  /api/v1/experience/insurance/claims:
+    post:
+      operationId: registerClaim
+      tags: [Claims]
+      responses:
+        "201":
+          description: Created
+  /api/v1/experience/insurance/claims/{claimId}/close:
+    post:
+      operationId: closeClaim
+      tags: [Claims]
+      parameters:
+        - name: claimId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Closed
