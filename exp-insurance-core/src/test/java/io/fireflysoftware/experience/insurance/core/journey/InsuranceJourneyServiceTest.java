@@ -17,7 +17,9 @@
 
 package io.fireflysoftware.experience.insurance.core.journey;
 
-import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsApi;
+import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsControllerApi;
+import io.fireflysoftware.domain.common.contracts.sdk.model.IssueBody;
+import io.fireflysoftware.domain.common.contracts.sdk.model.RecordedId;
 import io.fireflysoftware.experience.insurance.core.ports.AccessDecision;
 import io.fireflysoftware.experience.insurance.core.ports.AccessDeniedException;
 import io.fireflysoftware.experience.insurance.core.ports.AccessPort;
@@ -62,7 +64,7 @@ class InsuranceJourneyServiceTest {
     @Mock private UnderwritingPort underwriting;
     @Mock private PolicyPort policies;
     @Mock private ClaimPort claims;
-    @Mock private KitDocumentsApi kitDocumentsApi;
+    @Mock private KitDocumentsControllerApi kitDocumentsApi;
 
     private InsuranceJourneyService service;
 
@@ -74,7 +76,7 @@ class InsuranceJourneyServiceTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(kitDocumentsApi.issue(any(), any(), any(), any())).thenReturn(Mono.just(UUID.randomUUID()));
+        lenient().when(kitDocumentsApi.issue(any(), any())).thenReturn(Mono.just(new RecordedId().id(UUID.randomUUID())));
         service = new InsuranceJourneyService(identityPort, accessPort, creditReportPort, decisionPort,
                 catalog, underwriting, policies, claims, kitDocumentsApi);
         lenient().when(identityPort.resolve(any())).thenReturn(Mono.just(new SubjectRef(IdentityPort.SAMPLE_ACTOR, "sandbox")));
@@ -140,7 +142,8 @@ class InsuranceJourneyServiceTest {
 
         verify(decisionPort).decide(org.mockito.ArgumentMatchers.argThat(request ->
                 request.journeyStep() == JourneyStep.INSURANCE_BIND));
-        verify(kitDocumentsApi).issue(eq("letter"), any(), any(), any());
+        verify(kitDocumentsApi).issue(org.mockito.ArgumentMatchers.argThat(body ->
+                body instanceof IssueBody issue && "letter".equals(issue.getTemplateCode())), any());
     }
 
     @Test

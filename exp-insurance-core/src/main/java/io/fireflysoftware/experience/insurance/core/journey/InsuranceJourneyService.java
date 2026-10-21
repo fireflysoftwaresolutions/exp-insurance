@@ -17,7 +17,9 @@
 
 package io.fireflysoftware.experience.insurance.core.journey;
 
-import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsApi;
+import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsControllerApi;
+import io.fireflysoftware.domain.common.contracts.sdk.model.IssueBody;
+import io.fireflysoftware.domain.common.contracts.sdk.model.RecordedId;
 import io.fireflysoftware.experience.insurance.core.ports.AccessAction;
 import io.fireflysoftware.experience.insurance.core.ports.AccessGuard;
 import io.fireflysoftware.experience.insurance.core.ports.AccessPort;
@@ -60,7 +62,7 @@ public class InsuranceJourneyService {
     private final UnderwritingPort underwriting;
     private final PolicyPort policies;
     private final ClaimPort claims;
-    private final KitDocumentsApi kitDocumentsApi;
+    private final KitDocumentsControllerApi kitDocumentsApi;
 
     public Mono<InsuranceRecord> createQuote(QuoteCommand command) {
         return decided(InsuranceOperation.QUOTE_CREATE, "POLICY", command.partyId(), command.productId(),
@@ -93,7 +95,10 @@ public class InsuranceJourneyService {
         return decided(InsuranceOperation.POLICY_CREATE, "POLICY", partyId, command.productId(),
                 JourneyStep.INSURANCE_BIND,
                 settings -> policies.create(command, settings.defaultPolicyStatus())
-                        .flatMap(record -> kitDocumentsApi.issue("letter", partyId, record.id(), record.id().toString())
+                        .flatMap(record -> kitDocumentsApi.issue(
+                                        new IssueBody().templateCode("letter").partyId(partyId).contractId(record.id()),
+                                        record.id().toString())
+                                .map(RecordedId::getId)
                                 .map(record::withDocument)));
     }
 
