@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.fireflysoftware</groupId>
         <artifactId>exp-insurance</artifactId>
-        <version>26.10.5</version>
+        <version>26.10.6</version>
     </parent>
 
     <artifactId>exp-insurance-core</artifactId>
@@ -20,32 +20,32 @@
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-common-contracts-sdk</artifactId>
-            <version>26.10.5</version>
+            <version>26.10.6</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-core-security-center-sdk</artifactId>
-            <version>26.10.5</version>
+            <version>26.10.6</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-lending-credit-scoring-sdk</artifactId>
-            <version>26.10.5</version>
+            <version>26.10.6</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-insurance-underwriting-sdk</artifactId>
-            <version>26.10.5</version>
+            <version>26.10.6</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-insurance-policies-sdk</artifactId>
-            <version>26.10.5</version>
+            <version>26.10.6</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-insurance-claims-sdk</artifactId>
-            <version>26.10.5</version>
+            <version>26.10.6</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
