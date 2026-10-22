@@ -17,6 +17,9 @@
 
 package io.fireflysoftware.experience.insurance.core.adapter;
 
+import io.fireflysoftware.domain.lending.creditscoring.sdk.api.DecisionApi;
+import io.fireflysoftware.domain.lending.creditscoring.sdk.invoker.ApiClient;
+import io.fireflysoftware.domain.lending.creditscoring.sdk.model.DecisionResponse;
 import io.fireflysoftware.experience.insurance.core.ports.DecisionOutcome;
 import io.fireflysoftware.experience.insurance.core.ports.DecisionPort;
 import io.fireflysoftware.experience.insurance.core.ports.DecisionRequest;
@@ -26,12 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Calls domain-lending-credit-scoring {@code POST /api/v1/decisions}.
@@ -47,7 +45,10 @@ public class DomainDecisionConfiguration {
     public RiskDecisionClient riskDecisionClient(
             @Value("${api-configuration.domain-platform.lending-credit-scoring.base-path:http://localhost:8042}")
             String basePath) {
-        return new HttpDecisionClient(WebClient.builder().baseUrl(basePath).build());
+        String url = basePath.endsWith("/") ? basePath.substring(0, basePath.length() - 1) : basePath;
+        ApiClient client = new ApiClient();
+        client.setBasePath(url);
+        return new SdkDecisionClient(new DecisionApi(client));
     }
 
     @Bean
@@ -56,14 +57,14 @@ public class DomainDecisionConfiguration {
     }
 
     /**
-     * HTTP client for {@code POST /api/v1/decisions}. Package-visible so tests can construct it.
+     * SDK client for {@code POST /api/v1/decisions}. Package-visible so tests can construct it.
      */
-    public static final class HttpDecisionClient implements RiskDecisionClient {
+    public static final class SdkDecisionClient implements RiskDecisionClient {
 
-        private final WebClient webClient;
+        private final DecisionApi decisions;
 
-        public HttpDecisionClient(WebClient webClient) {
-            this.webClient = webClient;
+        public SdkDecisionClient(DecisionApi decisions) {
+            this.decisions = decisions;
         }
 
         @Override
@@ -71,24 +72,24 @@ public class DomainDecisionConfiguration {
             if (request.partyId() == null || request.journeyStep() == null) {
                 return Mono.error(new IllegalArgumentException("partyId and journeyStep are required"));
             }
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("partyId", request.partyId());
-            if (request.productId() != null) {
-                body.put("productId", request.productId());
-            }
-            body.put("journeyStep", request.journeyStep());
-            body.put("attributes", request.attributes());
-            return webClient.post()
-                    .uri("/api/v1/decisions")
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(DecisionPayload.class)
-                    .map(payload -> new DecisionResult(
-                            payload.outcome(),
-                            payload.reasonCodes() == null ? List.of() : payload.reasonCodes()));
+            io.fireflysoftware.domain.lending.creditscoring.sdk.model.DecisionRequest body =
+                    new io.fireflysoftware.domain.lending.creditscoring.sdk.model.DecisionRequest()
+                            .partyId(request.partyId())
+                            .productId(request.productId())
+                            .journeyStep(io.fireflysoftware.domain.lending.creditscoring.sdk.model.DecisionRequest.JourneyStepEnum
+                                    .fromValue(request.journeyStep().name()))
+                            .attributes(new java.util.HashMap<>(request.attributes()));
+            return decisions.evaluateDecision(body)
+                    .map(view -> new DecisionResult(
+                            DecisionOutcome.valueOf(outcome(view)),
+                            view.getReasonCodes() == null ? java.util.List.of() : view.getReasonCodes()));
         }
 
-        private record DecisionPayload(DecisionOutcome outcome, java.util.List<String> reasonCodes) {
+        private static String outcome(DecisionResponse view) {
+            if (view.getOutcome() == null || view.getOutcome().getValue() == null) {
+                throw new IllegalStateException("DOMAIN_RESPONSE_UNREADABLE");
+            }
+            return view.getOutcome().getValue();
         }
     }
 }
