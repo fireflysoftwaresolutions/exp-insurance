@@ -16,6 +16,7 @@
 
 package io.fireflysoftware.experience.insurance.core.journey;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public record PolicyCommand(
         UUID tenantId,
         UUID contractId,
         UUID productId,
-        UUID partyId,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) UUID partyId,
         String policyNumber,
         LineOfBusiness lineOfBusiness,
         PolicyStatus policyStatus,

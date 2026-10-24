@@ -18,7 +18,6 @@
 package io.fireflysoftware.experience.insurance.core.journey;
 
 import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsControllerApi;
-import io.fireflysoftware.domain.common.contracts.sdk.model.IssueBody;
 import io.fireflysoftware.domain.common.contracts.sdk.model.RecordedId;
 import io.fireflysoftware.experience.insurance.core.ports.AccessDecision;
 import io.fireflysoftware.experience.insurance.core.ports.AccessDeniedException;
@@ -52,6 +51,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class InsuranceJourneyServiceTest {
@@ -130,20 +130,143 @@ class InsuranceJourneyServiceTest {
     }
 
     @Test
-    void bind_usesInsuranceBindStep() {
+    void bind_approvedDecisionFailsBeforePolicyOrLegacyDocumentEffects() {
         when(creditReportPort.request(any())).thenReturn(Mono.just(
                 new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
         when(decisionPort.decide(any())).thenReturn(Mono.just(DecisionResult.approve()));
-        when(policies.create(any(), any())).thenReturn(Mono.just(new InsuranceRecord(UUID.randomUUID(), "P-1", "BOUND")));
+        lenient().when(policies.create(any(), any())).thenReturn(Mono.just(
+                new InsuranceRecord(UUID.randomUUID(), "P-1", "BOUND")));
+        lenient().when(kitDocumentsApi.issue(any(), any())).thenReturn(Mono.error(
+                new org.fireflyframework.web.error.exceptions.BusinessException(
+                        org.springframework.http.HttpStatus.CONFLICT, "GOVERNED_DOCUMENT_INTENT_REQUIRED",
+                        "Complete governed document intent is required")));
 
         StepVerifier.create(service.bind(policy()))
-                .expectNextCount(1)
-                .verifyComplete();
+                .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                        && business.getStatus().value() == 503
+                        && "INSURANCE_BINDING_UNAVAILABLE".equals(business.getCode()))
+                .verify();
 
         verify(decisionPort).decide(org.mockito.ArgumentMatchers.argThat(request ->
                 request.journeyStep() == JourneyStep.INSURANCE_BIND));
-        verify(kitDocumentsApi).issue(org.mockito.ArgumentMatchers.argThat(body ->
-                body instanceof IssueBody issue && "letter".equals(issue.getTemplateCode())), any());
+        verifyNoInteractions(policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_repeatedSubscriptionCannotCreateAnotherPolicy() {
+        when(creditReportPort.request(any())).thenReturn(Mono.just(
+                new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
+        when(decisionPort.decide(any())).thenReturn(Mono.just(DecisionResult.approve()));
+        lenient().when(policies.create(any(), any())).thenReturn(Mono.just(
+                new InsuranceRecord(UUID.randomUUID(), "P-1", "BOUND")));
+        Mono<InsuranceRecord> request = service.bind(policy());
+
+        for (int subscription = 0; subscription < 2; subscription++) {
+            StepVerifier.create(request)
+                    .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                            && business.getStatus().value() == 503
+                            && "INSURANCE_BINDING_UNAVAILABLE".equals(business.getCode()))
+                    .verify();
+        }
+        verifyNoInteractions(policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_declineStillPrecedesBindingAvailability() {
+        when(creditReportPort.request(any())).thenReturn(Mono.just(
+                new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
+        when(decisionPort.decide(any())).thenReturn(Mono.just(
+                new DecisionResult(DecisionOutcome.DECLINE, List.of("HIGH_RISK"))));
+
+        StepVerifier.create(service.bind(policy()))
+                .expectError(DecisionDeclinedException.class)
+                .verify();
+        verifyNoInteractions(policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_deniedAccessStillPrecedesBindingAvailability() {
+        when(accessPort.check(any())).thenReturn(Mono.just(AccessDecision.denied("ACTOR_NOT_ENTITLED")));
+
+        StepVerifier.create(service.bind(policy()))
+                .expectError(AccessDeniedException.class)
+                .verify();
+        verifyNoInteractions(creditReportPort, decisionPort, policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_disabledJourneyStillPrecedesBindingAvailability() {
+        when(catalog.current(any())).thenReturn(Mono.just(new JourneySettings(
+                EnumSet.noneOf(InsuranceOperation.class), SubmissionStatus.RECEIVED,
+                PolicyStatus.BOUND, ClaimStatus.NOTIFIED)));
+
+        StepVerifier.create(service.bind(policy()))
+                .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                        && business.getStatus().value() == 409
+                        && "JOURNEY_NOT_ENABLED".equals(business.getCode()))
+                .verify();
+        verifyNoInteractions(creditReportPort, decisionPort, policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_referralDoesNotCreatePolicyOrDocument() {
+        lenient().when(policies.create(any(), any())).thenReturn(Mono.just(new InsuranceRecord(UUID.randomUUID(), "P-1", "BOUND")));
+        when(creditReportPort.request(any())).thenReturn(Mono.just(
+                new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
+        when(decisionPort.decide(any())).thenReturn(Mono.just(
+                new DecisionResult(DecisionOutcome.REFER, List.of("private-provider-value"))));
+
+        StepVerifier.create(service.bind(policy()))
+                .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                        && business.getStatus().value() == 409
+                        && !error.getMessage().contains("private-provider-value"))
+                .verify();
+        verifyNoInteractions(policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_missingOutcomeDoesNotCreatePolicyOrDocument() {
+        lenient().when(policies.create(any(), any())).thenReturn(Mono.just(new InsuranceRecord(UUID.randomUUID(), "P-1", "BOUND")));
+        when(creditReportPort.request(any())).thenReturn(Mono.just(
+                new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
+        when(decisionPort.decide(any())).thenReturn(Mono.just(new DecisionResult(null, List.of())));
+
+        StepVerifier.create(service.bind(policy()))
+                .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                        && business.getStatus().value() == 503)
+                .verify();
+        verifyNoInteractions(policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_emptyDecisionDoesNotReturnAnEmptySuccess() {
+        when(creditReportPort.request(any())).thenReturn(Mono.just(
+                new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
+        when(decisionPort.decide(any())).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.bind(policy()))
+                .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                        && business.getStatus().value() == 503)
+                .verify();
+        verifyNoInteractions(policies, kitDocumentsApi);
+    }
+
+    @Test
+    void bind_missingPartyDoesNotUseContractAsCustomerIdentity() {
+        lenient().when(creditReportPort.request(any())).thenReturn(Mono.just(
+                new CreditReportView("sandbox", "sandbox-report", 640, "ILLUSTRATIVE", true)));
+        lenient().when(decisionPort.decide(any())).thenReturn(Mono.just(DecisionResult.approve()));
+        lenient().when(policies.create(any(), any())).thenReturn(Mono.just(new InsuranceRecord(UUID.randomUUID(), "P-1", "BOUND")));
+        var command = policy();
+        var invalid = new PolicyCommand(command.tenantId(), command.contractId(), command.productId(), null,
+                command.policyNumber(), command.lineOfBusiness(), command.policyStatus(), command.inceptionDate(),
+                command.expiryDate(), command.currency());
+
+        StepVerifier.create(service.bind(invalid))
+                .expectErrorMatches(error -> error instanceof org.fireflyframework.web.error.exceptions.BusinessException business
+                        && business.getStatus().value() == 400)
+                .verify();
+        verifyNoInteractions(identityPort, accessPort, creditReportPort, decisionPort, policies, kitDocumentsApi);
     }
 
     @Test

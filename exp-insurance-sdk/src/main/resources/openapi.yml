@@ -1,55 +1,675 @@
 openapi: 3.0.1
 info:
-  title: Experience Insurance API
-  description: Customer journey for quote, bind, claim, and the servicing sagas those domains already expose.
-  version: 26.10.6
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:18080
+  description: Generated server url
 paths:
+  /api/v1/experience/insurance/quotes/{submissionId}:
+    get:
+      tags:
+      - insurance-controller
+      operationId: readQuote
+      parameters:
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+    put:
+      tags:
+      - insurance-controller
+      operationId: updateQuote
+      parameters:
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/quotes/{submissionId}/status:
+    put:
+      tags:
+      - insurance-controller
+      operationId: quoteStatus
+      parameters:
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteStatusBody"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/policies/{policyId}:
+    get:
+      tags:
+      - insurance-controller
+      operationId: readPolicy
+      parameters:
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+    put:
+      tags:
+      - insurance-controller
+      operationId: updatePolicy
+      parameters:
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolicyCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/policies/{policyId}/status:
+    put:
+      tags:
+      - insurance-controller
+      operationId: policyStatus
+      parameters:
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolicyStatusBody"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/claims/{claimId}:
+    get:
+      tags:
+      - insurance-controller
+      operationId: readClaim
+      parameters:
+      - name: claimId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+    put:
+      tags:
+      - insurance-controller
+      operationId: updateClaim
+      parameters:
+      - name: claimId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/claims/{claimId}/status:
+    put:
+      tags:
+      - insurance-controller
+      operationId: claimStatus
+      parameters:
+      - name: claimId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimStatusBody"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
   /api/v1/experience/insurance/quotes:
     post:
+      tags:
+      - insurance-controller
       operationId: createQuote
-      tags: [Quotes]
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteCommand"
+        required: true
       responses:
         "201":
           description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/quotes/{submissionId}/withdraw:
+    post:
+      tags:
+      - insurance-controller
+      operationId: withdrawQuote
+      parameters:
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonCommand"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
   /api/v1/experience/insurance/policies:
     post:
-      operationId: bindPolicy
-      tags: [Policies]
+      tags:
+      - insurance-controller
+      summary: Check insurance binding prerequisites
+      description: Binding is unavailable until authoritative quote acceptance and
+        recoverable policy/document integration are connected
+      operationId: bind
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: Compatibility header; this route does not cache responses or
+          derive authority from it.
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolicyCommand"
+        required: true
       responses:
         "201":
-          description: Created
+          description: Reserved legacy success schema; binding is currently unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+        "400":
+          description: An explicit party identifier is required
+        "409":
+          description: Referral requires an authorized resolution before binding
+        "422":
+          description: Configured decision declined the operation
+        "503":
+          description: "Required decision is unavailable, or approved binding is fenced\
+            \ before policy and document effects"
+      x-disable-idempotency: true
   /api/v1/experience/insurance/policies/{policyId}/cancel:
     post:
+      tags:
+      - insurance-controller
       operationId: cancelPolicy
-      tags: [Policies]
       parameters:
-        - name: policyId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonCommand"
+        required: true
       responses:
         "200":
-          description: Cancelled
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
   /api/v1/experience/insurance/claims:
     post:
+      tags:
+      - insurance-controller
       operationId: registerClaim
-      tags: [Claims]
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimCommand"
+        required: true
       responses:
         "201":
           description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
   /api/v1/experience/insurance/claims/{claimId}/close:
     post:
+      tags:
+      - insurance-controller
       operationId: closeClaim
-      tags: [Claims]
       parameters:
-        - name: claimId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: claimId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonCommand"
+        required: true
       responses:
         "200":
-          description: Closed
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InsuranceRecord"
+components:
+  schemas:
+    QuoteCommand:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        partyId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        submissionNumber:
+          type: string
+        lineOfBusiness:
+          type: string
+          enum:
+          - MOTOR
+          - PROPERTY
+          - LIABILITY
+          - LIFE
+          - HEALTH
+          - MARINE
+          - AVIATION
+          - ACCIDENT
+          - OTHER
+        submissionStatus:
+          type: string
+          enum:
+          - RECEIVED
+          - IN_CLEARANCE
+          - REFERRED
+          - QUOTED
+          - BOUND
+          - DECLINED
+          - WITHDRAWN
+        currency:
+          type: string
+    InsuranceRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference:
+          type: string
+        status:
+          type: string
+        documentId:
+          type: string
+          format: uuid
+    QuoteStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - RECEIVED
+          - IN_CLEARANCE
+          - REFERRED
+          - QUOTED
+          - BOUND
+          - DECLINED
+          - WITHDRAWN
+        reason:
+          type: string
+    PolicyCommand:
+      required:
+      - partyId
+      type: object
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        contractId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        partyId:
+          type: string
+          format: uuid
+        policyNumber:
+          type: string
+        lineOfBusiness:
+          type: string
+          enum:
+          - MOTOR
+          - PROPERTY
+          - LIABILITY
+          - LIFE
+          - HEALTH
+          - MARINE
+          - AVIATION
+          - ACCIDENT
+          - OTHER
+        policyStatus:
+          type: string
+          enum:
+          - QUOTE
+          - BOUND
+          - IN_FORCE
+          - LAPSED
+          - CANCELLED
+          - EXPIRED
+        inceptionDate:
+          type: string
+          format: date
+        expiryDate:
+          type: string
+          format: date
+        currency:
+          type: string
+    PolicyStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - QUOTE
+          - BOUND
+          - IN_FORCE
+          - LAPSED
+          - CANCELLED
+          - EXPIRED
+        reason:
+          type: string
+    ClaimCommand:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        policyId:
+          type: string
+          format: uuid
+        claimNumber:
+          type: string
+        claimStatus:
+          type: string
+          enum:
+          - NOTIFIED
+          - OPEN
+          - UNDER_ASSESSMENT
+          - RESERVED
+          - SETTLED
+          - CLOSED
+          - REOPENED
+          - DENIED
+        lossDate:
+          type: string
+          format: date
+        notifiedAt:
+          type: string
+          format: date-time
+        causeCode:
+          type: string
+        description:
+          type: string
+        currency:
+          type: string
+    ClaimStatusBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - NOTIFIED
+          - OPEN
+          - UNDER_ASSESSMENT
+          - RESERVED
+          - SETTLED
+          - CLOSED
+          - REOPENED
+          - DENIED
+        reason:
+          type: string
+    ReasonCommand:
+      type: object
+      properties:
+        reason:
+          type: string

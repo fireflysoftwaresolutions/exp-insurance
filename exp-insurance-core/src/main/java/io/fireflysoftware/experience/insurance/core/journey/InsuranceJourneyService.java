@@ -18,8 +18,6 @@
 package io.fireflysoftware.experience.insurance.core.journey;
 
 import io.fireflysoftware.domain.common.contracts.sdk.api.KitDocumentsControllerApi;
-import io.fireflysoftware.domain.common.contracts.sdk.model.IssueBody;
-import io.fireflysoftware.domain.common.contracts.sdk.model.RecordedId;
 import io.fireflysoftware.experience.insurance.core.ports.AccessAction;
 import io.fireflysoftware.experience.insurance.core.ports.AccessGuard;
 import io.fireflysoftware.experience.insurance.core.ports.AccessPort;
@@ -91,15 +89,16 @@ public class InsuranceJourneyService {
     }
 
     public Mono<InsuranceRecord> bind(PolicyCommand command) {
-        UUID partyId = command.partyId() != null ? command.partyId() : command.contractId();
+        if (command == null || command.partyId() == null) {
+            return Mono.error(new BusinessException(HttpStatus.BAD_REQUEST, "INSURANCE_PARTY_REQUIRED",
+                    "Insurance binding requires an explicit party identifier"));
+        }
+        UUID partyId = command.partyId();
         return decided(InsuranceOperation.POLICY_CREATE, "POLICY", partyId, command.productId(),
                 JourneyStep.INSURANCE_BIND,
-                settings -> policies.create(command, settings.defaultPolicyStatus())
-                        .flatMap(record -> kitDocumentsApi.issue(
-                                        new IssueBody().templateCode("letter").partyId(partyId).contractId(record.id()),
-                                        record.id().toString())
-                                .map(RecordedId::getId)
-                                .map(record::withDocument)));
+                settings -> Mono.error(new BusinessException(HttpStatus.SERVICE_UNAVAILABLE,
+                        "INSURANCE_BINDING_UNAVAILABLE",
+                        "Insurance binding requires authoritative quote acceptance and recoverable policy/document integration")));
     }
 
     public Mono<InsuranceRecord> readPolicy(UUID policyId) {
