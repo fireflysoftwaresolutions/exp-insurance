@@ -12,6 +12,11 @@
     <artifactId>exp-insurance-web</artifactId>
     <name>exp-insurance-web</name>
 
+    <properties>
+        <openapi.gen.skip>false</openapi.gen.skip>
+        <openapi.gen.mainClass>io.fireflysoftware.experience.insurance.web.openapi.OpenApiGenApplication</openapi.gen.mainClass>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.fireflysoftware</groupId>

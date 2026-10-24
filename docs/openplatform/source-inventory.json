@@ -1,0 +1,1222 @@
+{
+  "adapters": [
+    {
+      "implements": "CreditReportPort",
+      "memory": false,
+      "methods": [
+        "request"
+      ],
+      "name": "SandboxCreditReportAdapter",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxCreditReportAdapter.java",
+      "synthetic": true
+    },
+    {
+      "implements": "DecisionPort",
+      "memory": false,
+      "methods": [
+        "decide"
+      ],
+      "name": "SandboxDecisionAdapter",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxDecisionAdapter.java",
+      "synthetic": true
+    },
+    {
+      "implements": "JourneyCatalogPort",
+      "memory": false,
+      "methods": [
+        "current"
+      ],
+      "name": "SandboxJourneyCatalogAdapter",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxJourneyCatalogAdapter.java",
+      "synthetic": true
+    }
+  ],
+  "ci_jdks": [
+    "25"
+  ],
+  "conditions": [
+    {
+      "expression": "name = \"firefly.experience.access.adapter\", havingValue = \"domain\", matchIfMissing = true",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainAccessConfiguration.java"
+    },
+    {
+      "expression": "name = \"firefly.experience.decision.adapter\", havingValue = \"domain\", matchIfMissing = true",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainDecisionConfiguration.java"
+    },
+    {
+      "expression": "name = \"firefly.experience.credit-report.adapter\", havingValue = \"sandbox\", matchIfMissing = true",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxCreditReportAdapter.java"
+    },
+    {
+      "expression": "name = \"firefly.experience.decision.adapter\", havingValue = \"sandbox\"",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxDecisionAdapter.java"
+    },
+    {
+      "expression": "name = \"firefly.experience.insurance.catalog\", havingValue = \"sandbox\", matchIfMissing = true",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxJourneyCatalogAdapter.java"
+    }
+  ],
+  "config_files": [
+    "exp-insurance-sdk/src/main/resources/openapi.yml",
+    "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/ExpInsuranceApplication.java",
+    "exp-insurance-web/src/main/resources/application.yaml"
+  ],
+  "docs": [
+    {
+      "path": "docs/insurance-bind-decision-boundary.md",
+      "title": "Insurance binding decision boundary"
+    }
+  ],
+  "editorial_sha256": "39743ed9f2a12f4446665ccae99c166c84db76fc657362db6259473f67989bfc",
+  "errors": [
+    {
+      "evidence": "new IllegalArgumentException(\"partyId and journeyStep are required\"));",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainDecisionConfiguration.java"
+    },
+    {
+      "evidence": "new IllegalStateException(\"DOMAIN_RESPONSE_UNREADABLE\");",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainDecisionConfiguration.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.BAD_REQUEST, \"VALIDATION_FAILED\", name + \" is required\");",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/HttpInsuranceConfiguration.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.BAD_REQUEST, \"VALIDATION_FAILED\", name + \" is required\");",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/HttpInsuranceConfiguration.java"
+    },
+    {
+      "evidence": "new UncheckedIOException(ex);",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxJourneyCatalogAdapter.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.BAD_REQUEST, \"INSURANCE_PARTY_REQUIRED\",",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyService.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.SERVICE_UNAVAILABLE,",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyService.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.CONFLICT, \"JOURNEY_NOT_ENABLED\",",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyService.java"
+    },
+    {
+      "evidence": "new AccessDeniedException(decision.reason())));",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessGuard.java"
+    },
+    {
+      "evidence": "new AccessDeniedException(decision.reason())));",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessGuard.java"
+    },
+    {
+      "evidence": "new AccessDeniedException(\"ACTOR_UNKNOWN\")))",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessGuard.java"
+    },
+    {
+      "evidence": "HttpStatus.UNPROCESSABLE_ENTITY",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionDeclinedException.java"
+    },
+    {
+      "evidence": "new DecisionDeclinedException(result.reasonCodes()));",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/RiskStep.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.CONFLICT, \"INSURANCE_REFERRAL_REQUIRED\",",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/RiskStep.java"
+    },
+    {
+      "evidence": "new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, \"INSURANCE_DECISION_UNAVAILABLE\",",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/RiskStep.java"
+    },
+    {
+      "evidence": "@ResponseStatus(HttpStatus.CREATED)",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java"
+    },
+    {
+      "evidence": "@ResponseStatus(HttpStatus.CREATED)",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java"
+    },
+    {
+      "evidence": "@ResponseStatus(HttpStatus.CREATED)",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java"
+    }
+  ],
+  "files": {
+    ".github/workflows/release.yml": "f9ee9bcda508673f047eeae1d605d7d2b7893f575c6687088900c9e4334396b9",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "docs/insurance-bind-decision-boundary.md": "607c4386800ce02165e556027fb63c22ef40accd2c6dc9218825ae54c762ec6d",
+    "exp-insurance-core/pom.xml": "7fe75b29842ea0ea8da7c7a7114361f5df5ef10b9c0c216a48a3199d0e68ef23",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainAccessConfiguration.java": "6fc9e0c6a8e0f4751513c94bf173ca652f0f5760301684dead34754ebfcd513c",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainDecisionConfiguration.java": "6969cacb1f22110da15937a4f7d40d4b7896630cbf7aa5b8e93d921009276076",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/HttpInsuranceConfiguration.java": "88ef06430625bd8c3494e1c8169fb7bc4b827f5520eb0b787f4ecdcabec2be93",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxCreditReportAdapter.java": "0184a61607e7f788109642e0dd780c28d64ce1c7e21cc2de38477c454c175edd",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxDecisionAdapter.java": "bccc5a4877e9d17fee65b16ed51d1b557ff3bf81017e3f01f125c0abb5741182",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxJourneyCatalogAdapter.java": "8747a30b80c0ece72a23190c3d4d622d3ee5c068e3accd4edada509d8012467e",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ClaimCommand.java": "5272357a0567576c475ae0f676617dbc40b5803ecbced9fa720afa55ba231f3c",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ClaimPort.java": "a268018fa572ea802ffe8eff3cb596277565f648a3567a1c713b0e35f49961e1",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ClaimStatus.java": "e80d9f466dd07ca60de62e03692869570a8e6846b1dc9190edf70166263e702f",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyService.java": "eae859b1c4d3dd9d4a803ec7782497f1c9824de2417c72c6c11a1e9e1006b586",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceOperation.java": "83172a27cfa84dc0581d466d09ea889a866f52baa4f5993826d9f5c5da093af0",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceRecord.java": "fa10604782a74b269622b6b78904201add3114d1efbc227d283a4ebec6ef8100",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/JourneyCatalogPort.java": "a92c97a9995fcecbe846d786328fabf6a5b2d914278af75660f6a11f6986ba17",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/JourneySettings.java": "97b1c803d4468f8f58eed891b17399f3232f15daf168673c805a6e376f12cd08",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/KitDocumentClientConfiguration.java": "0e7e5f344835b36011b4ae76aefbcaf18f8364da1acba91ab91ebe7147f18238",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/LineOfBusiness.java": "96f8c3d5a9e236b7edd97ed2966fc67f98868f291d8e6662123ba08fc9e265fd",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/PolicyCommand.java": "42736c3e8d31474476f6472370e1c098ea789b48d98e6ffa219371d88339853f",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/PolicyPort.java": "336aecbc8759c33b1d7e71f25439f5a92d476c3bbe9869bc9d2b0ef6c6e14769",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/PolicyStatus.java": "1791a84a298c0fbf2409e4929d9ac3fba1cdbc6ac4ecd4a03e12c4dd3bc49aeb",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/QuoteCommand.java": "e6773b7a754d85bb00444966b29212039283a7a7502bd47444e6420d10d5cfc0",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ReasonCommand.java": "e8ed1c6e7880556b4a26a06c1c3804eca8c063d190080c0e086c588e6eba5014",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/StatusCommand.java": "5855cb091bf4b4b84c27d6c21ae0872ced4e95866148eaca4c7e8653af4eb83c",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/SubmissionStatus.java": "1e54b402f7da5c9dc831432991cc3e2693d560d2f7da7b61076e371af07017a9",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/UnderwritingPort.java": "93e5d7a70632a899fb156503a14e1f28a4422c706c19112def4dba5d170929cc",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessAction.java": "a27e97e98595f2a86c8546186c7a78f19859a453b8839be5ca03d4f99a9ea6d3",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessDecision.java": "64b80465bfed8ea54c7adc24282a7ab78ec606d0101d1845a9f4cddca4b7a786",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessDeniedException.java": "40db5eaf012f3edf5ae8679e511b751b39dc80fbe913536458b971a6b87d04f9",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessGuard.java": "3f59e187a80638638acf48a6e84e6b42921083a6c322c70a9dff80e703387474",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessPort.java": "3bafd10c3c8e9f066f2bd31c8e2201828f1d9cfdd9d7225e7a14b31390fef8e4",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessRequest.java": "cfcce03f258a7c3f23f7770240fc4346d33533c73b3defc22a95c14aef52c147",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditBureauClient.java": "bcd0f7b76e96d5ed5d8063bd31b78b17b3ac1258119e7474238c34cb186af503",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditReportPort.java": "8e310daf266b4bd4715ec89b7ef1c5fbbb48ae42a19410f5c03f1b3f9fc34dc1",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditReportQuery.java": "c7996518699159c93b007daef19caa940334d700a42b656f3e06de28d9dd0872",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditReportView.java": "71592502f03c1bafa96995386834e7416e00da01b25dd06b106bea8c0d028fd5",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionDeclinedException.java": "99b8f05b37a38a5f88c2565b36d538c450deaa84dbdd6889746ac183888f6f19",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionOutcome.java": "1b39e73792333dfdc344ef5263f1c34a38cbc6ae10c9c93e3ebce904da4a2cfd",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionPort.java": "7a17cb988b12add474d04ecdce29f34cbf7c86c7f3db32f304ef04fd1921d761",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionRequest.java": "e3d101a6fdda7335ff8b8108f3a820260ca8dc92619335d2966c2add569f44d3",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionResult.java": "de7d64b0e1ce721fc3c0bbfb45fb1a457f0682f1e5e91f126b0e362af5cd014c",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/IdentityPort.java": "88d6db96928d860dd652dc1f17aeccceead9411f051451d9fd76657b7f353d72",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/JourneyStep.java": "926682d6bc90f1e68814af1abbc2e5423698c5f7f2593b276f2a97933f5c8b13",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/RiskDecisionClient.java": "9b86d531d0949c11e440d2702e376a3002ac4146f246025bb2b95a5919b30d69",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/RiskStep.java": "e9b7ec438b3e3f30c49d509b966132e64b11e7efbe1cdf6d2d87ec32dc9d6e3a",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/SecurityCenterClient.java": "8891c6317cbd88cce9dd122308058641b550fec123de12a7ddc12cfbf1c06276",
+    "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/SubjectRef.java": "4ab4493915e6f7c7acb16ccc9880f44320578039811e93015837ac4417b6354c",
+    "exp-insurance-core/src/main/resources/insurance-journey-catalog.json": "6f51a92268495b5efc19e965ddf554ba8575d797a64b2448e00d7a2c955249bb",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpPolicyClientTest.java": "60bf6d51927ccf7fed1e396de3d8cc7b6ddf95b18f712f4d1d28770144857a9e",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpUnderwritingClientTest.java": "3a91bbdddb794506c520f61811768314428fb1b29d8895c41b45ed496f53c72b",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java": "61abdc66f8e3930d51716728cb937d919ddbbc015b7e2724ac4f4d8bc0d243e8",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java": "cb6218017b259f8b5472968c223dbe70f615adb86711c657fbbe593af26f39f7",
+    "exp-insurance-sdk/pom.xml": "2492112f9a851f3273653bf8b90dc78710792a9cb7f53632302871af4c15648b",
+    "exp-insurance-sdk/src/main/resources/openapi.yml": "f28dd065bcab99c53f82078f5dd3f0fef7a65c6755ed494a60c8fcf51b9529ec",
+    "exp-insurance-web/pom.xml": "82e40e06690bc5965bfcd098aad76d1c42fb390e25b3d21ca90349991f22e2a8",
+    "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/ExpInsuranceApplication.java": "9ff9b2f61efb50367ecc7d99acb77f7b1b66aaa6d8d2ba0bb8e9cbc4153a2acd",
+    "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/config/WebSecurityConfig.java": "29f7da6719d26dafd73f17c3a3a76c77e6ef9068625265faa2148d499d5b2a47",
+    "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java": "df8bdcb38e1238dc76f91045d9b63914e7a2719844438c5c2ec01d11d4871f8b",
+    "exp-insurance-web/src/main/resources/application.yaml": "15a18df4a02001c0eb43dd28d72b1431dd8d7b4324b5b515cdce71ad658e7dc5",
+    "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java": "eaf97d72ff71490608aaf9c72854c45cbaad75783af3b1679f4f2a49539fc2f2",
+    "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/openapi/OpenApiGenApplication.java": "717ac5bd345e32357552196e6d473ada1cdfb97fbd2b03f47876278bf75a1697",
+    "pom.xml": "b7704f002290eb2eadafd6114d77e07a75369cd6bba00e210f798b6fbcab3264"
+  },
+  "migrations": [],
+  "modules": [
+    "exp-insurance-core",
+    "exp-insurance-web",
+    "exp-insurance-sdk"
+  ],
+  "operations": [
+    {
+      "abstract": false,
+      "mapping": "\"/quotes/{submissionId}\"",
+      "method": "readQuote",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/quotes/{submissionId}",
+      "signature": "public Mono<InsuranceRecord> readQuote(@PathVariable UUID submissionId)",
+      "verb": "GET"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/policies/{policyId}\"",
+      "method": "readPolicy",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/policies/{policyId}",
+      "signature": "public Mono<InsuranceRecord> readPolicy(@PathVariable UUID policyId)",
+      "verb": "GET"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/claims/{claimId}\"",
+      "method": "readClaim",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/claims/{claimId}",
+      "signature": "public Mono<InsuranceRecord> readClaim(@PathVariable UUID claimId)",
+      "verb": "GET"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/quotes\"",
+      "method": "createQuote",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/quotes",
+      "signature": "public Mono<InsuranceRecord> createQuote(@RequestBody QuoteCommand command)",
+      "verb": "POST"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/quotes/{submissionId}/withdraw\"",
+      "method": "withdrawQuote",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/quotes/{submissionId}/withdraw",
+      "signature": "public Mono<InsuranceRecord> withdrawQuote(@PathVariable UUID submissionId, @RequestBody ReasonCommand command)",
+      "verb": "POST"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/policies\"",
+      "method": "bind",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/policies",
+      "signature": "public Mono<InsuranceRecord> bind(@RequestBody PolicyCommand command, @Parameter(description = \"Compatibility header; this route does not cache responses or derive authority from it.\") @RequestHeader(name = \"X-Idempotency-Key\", required = false) String ignoredIdempotencyKey)",
+      "verb": "POST"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/policies/{policyId}/cancel\"",
+      "method": "cancelPolicy",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/policies/{policyId}/cancel",
+      "signature": "public Mono<InsuranceRecord> cancelPolicy(@PathVariable UUID policyId, @RequestBody ReasonCommand command)",
+      "verb": "POST"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/claims\"",
+      "method": "registerClaim",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/claims",
+      "signature": "public Mono<InsuranceRecord> registerClaim(@RequestBody ClaimCommand command)",
+      "verb": "POST"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/claims/{claimId}/close\"",
+      "method": "closeClaim",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/claims/{claimId}/close",
+      "signature": "public Mono<InsuranceRecord> closeClaim(@PathVariable UUID claimId, @RequestBody ReasonCommand command)",
+      "verb": "POST"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/quotes/{submissionId}\"",
+      "method": "updateQuote",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/quotes/{submissionId}",
+      "signature": "public Mono<InsuranceRecord> updateQuote(@PathVariable UUID submissionId, @RequestBody QuoteCommand command)",
+      "verb": "PUT"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/quotes/{submissionId}/status\"",
+      "method": "quoteStatus",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/quotes/{submissionId}/status",
+      "signature": "public Mono<InsuranceRecord> quoteStatus(@PathVariable UUID submissionId, @RequestBody QuoteStatusBody body)",
+      "verb": "PUT"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/policies/{policyId}\"",
+      "method": "updatePolicy",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/policies/{policyId}",
+      "signature": "public Mono<InsuranceRecord> updatePolicy(@PathVariable UUID policyId, @RequestBody PolicyCommand command)",
+      "verb": "PUT"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/policies/{policyId}/status\"",
+      "method": "policyStatus",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/policies/{policyId}/status",
+      "signature": "public Mono<InsuranceRecord> policyStatus(@PathVariable UUID policyId, @RequestBody PolicyStatusBody body)",
+      "verb": "PUT"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/claims/{claimId}\"",
+      "method": "updateClaim",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/claims/{claimId}",
+      "signature": "public Mono<InsuranceRecord> updateClaim(@PathVariable UUID claimId, @RequestBody ClaimCommand command)",
+      "verb": "PUT"
+    },
+    {
+      "abstract": false,
+      "mapping": "\"/claims/{claimId}/status\"",
+      "method": "claimStatus",
+      "owner": "InsuranceController",
+      "path": "exp-insurance-web/src/main/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceController.java",
+      "route": "/api/v1/experience/insurance/claims/{claimId}/status",
+      "signature": "public Mono<InsuranceRecord> claimStatus(@PathVariable UUID claimId, @RequestBody ClaimStatusBody body)",
+      "verb": "PUT"
+    }
+  ],
+  "poms": [
+    {
+      "artifact": "exp-insurance-core",
+      "dependencies": [
+        "org.fireflyframework:fireflyframework-web:",
+        "io.fireflysoftware:domain-common-contracts-sdk:26.10.6",
+        "io.fireflysoftware:domain-core-security-center-sdk:26.10.6",
+        "io.fireflysoftware:domain-lending-credit-scoring-sdk:26.10.6",
+        "io.fireflysoftware:domain-insurance-underwriting-sdk:26.10.6",
+        "io.fireflysoftware:domain-insurance-policies-sdk:26.10.6",
+        "io.fireflysoftware:domain-insurance-claims-sdk:26.10.6",
+        "org.springframework.boot:spring-boot-starter-webflux:",
+        "org.projectlombok:lombok:",
+        "org.springframework.boot:spring-boot-starter-test:",
+        "io.projectreactor:reactor-test:"
+      ],
+      "group": "io.fireflysoftware",
+      "java": "",
+      "parent": "io.fireflysoftware:exp-insurance:26.10.6",
+      "path": "exp-insurance-core/pom.xml",
+      "plugins": [
+        "maven-compiler-plugin"
+      ],
+      "version": "26.10.6"
+    },
+    {
+      "artifact": "exp-insurance-sdk",
+      "dependencies": [
+        "io.swagger.core.v3:swagger-annotations:",
+        "com.fasterxml.jackson.core:jackson-databind:",
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:",
+        "jakarta.annotation:jakarta.annotation-api:",
+        "com.squareup.okhttp3:okhttp:",
+        "com.squareup.okhttp3:logging-interceptor:",
+        "org.openapitools:jackson-databind-nullable:0.2.8",
+        "javax.annotation:javax.annotation-api:1.3.2",
+        "org.springframework:spring-webflux:"
+      ],
+      "group": "io.fireflysoftware",
+      "java": "",
+      "parent": "io.fireflysoftware:exp-insurance:26.10.6",
+      "path": "exp-insurance-sdk/pom.xml",
+      "plugins": [
+        "openapi-generator-maven-plugin"
+      ],
+      "version": "26.10.6"
+    },
+    {
+      "artifact": "exp-insurance-web",
+      "dependencies": [
+        "io.fireflysoftware:exp-insurance-core:",
+        "org.fireflyframework:fireflyframework-starter-application:",
+        "org.fireflyframework:fireflyframework-web:",
+        "org.springframework.boot:spring-boot-starter-webflux:",
+        "org.springframework.boot:spring-boot-starter-actuator:",
+        "org.springframework.boot:spring-boot-starter-validation:",
+        "org.springdoc:springdoc-openapi-starter-webflux-ui:",
+        "org.projectlombok:lombok:",
+        "org.springframework.boot:spring-boot-starter-test:",
+        "org.springframework.boot:spring-boot-starter-webflux-test:",
+        "io.projectreactor:reactor-test:"
+      ],
+      "group": "io.fireflysoftware",
+      "java": "",
+      "parent": "io.fireflysoftware:exp-insurance:26.10.6",
+      "path": "exp-insurance-web/pom.xml",
+      "plugins": [
+        "maven-compiler-plugin",
+        "spring-boot-maven-plugin"
+      ],
+      "version": "26.10.6"
+    },
+    {
+      "artifact": "exp-insurance",
+      "dependencies": [
+        "io.fireflysoftware:exp-insurance-core:${project.version}",
+        "io.fireflysoftware:exp-insurance-web:${project.version}",
+        "io.fireflysoftware:exp-insurance-sdk:${project.version}"
+      ],
+      "group": "io.fireflysoftware",
+      "java": "25",
+      "parent": "io.fireflysoftware:firefly-parent:26.10.6",
+      "path": "pom.xml",
+      "plugins": [],
+      "version": "26.10.6"
+    }
+  ],
+  "ports": [
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<InsuranceRecord> create(ClaimCommand command, ClaimStatus defaultStatus)",
+        "Mono<InsuranceRecord> get(UUID claimId)",
+        "Mono<InsuranceRecord> update(UUID claimId, ClaimCommand command)",
+        "Mono<InsuranceRecord> status(UUID claimId, ClaimStatus status, String reason)",
+        "Mono<InsuranceRecord> close(UUID claimId, String reason)"
+      ],
+      "name": "ClaimPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ClaimPort.java"
+    },
+    {
+      "boundary": true,
+      "boundary_evidence": [
+        {
+          "implementation": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxJourneyCatalogAdapter.java",
+          "selectors": [
+            {
+              "expression": "name = \"firefly.experience.insurance.catalog\", havingValue = \"sandbox\", matchIfMissing = true",
+              "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxJourneyCatalogAdapter.java"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        "Mono<JourneySettings> current(UUID productId)"
+      ],
+      "name": "JourneyCatalogPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/JourneyCatalogPort.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<InsuranceRecord> create(PolicyCommand command, PolicyStatus defaultStatus)",
+        "Mono<InsuranceRecord> get(UUID policyId)",
+        "Mono<InsuranceRecord> update(UUID policyId, PolicyCommand command)",
+        "Mono<InsuranceRecord> status(UUID policyId, PolicyStatus status, String reason)",
+        "Mono<InsuranceRecord> cancel(UUID policyId, String reason)"
+      ],
+      "name": "PolicyPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/PolicyPort.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<InsuranceRecord> create(QuoteCommand command, SubmissionStatus defaultStatus)",
+        "Mono<InsuranceRecord> get(UUID submissionId)",
+        "Mono<InsuranceRecord> update(UUID submissionId, QuoteCommand command)",
+        "Mono<InsuranceRecord> status(UUID submissionId, SubmissionStatus status, String reason)",
+        "Mono<InsuranceRecord> withdraw(UUID submissionId, String reason)"
+      ],
+      "name": "UnderwritingPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/UnderwritingPort.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<AccessDecision> check(AccessRequest request)"
+      ],
+      "name": "AccessPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessPort.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<CreditReportView> request(CreditReportQuery query)"
+      ],
+      "name": "CreditBureauClient",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditBureauClient.java"
+    },
+    {
+      "boundary": true,
+      "boundary_evidence": [
+        {
+          "implementation": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxCreditReportAdapter.java",
+          "selectors": [
+            {
+              "expression": "name = \"firefly.experience.credit-report.adapter\", havingValue = \"sandbox\", matchIfMissing = true",
+              "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxCreditReportAdapter.java"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        "Mono<CreditReportView> request(CreditReportQuery query)"
+      ],
+      "name": "CreditReportPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditReportPort.java"
+    },
+    {
+      "boundary": true,
+      "boundary_evidence": [
+        {
+          "implementation": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxDecisionAdapter.java",
+          "selectors": [
+            {
+              "expression": "name = \"firefly.experience.decision.adapter\", havingValue = \"sandbox\"",
+              "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/SandboxDecisionAdapter.java"
+            }
+          ]
+        }
+      ],
+      "methods": [
+        "Mono<DecisionResult> decide(DecisionRequest request)"
+      ],
+      "name": "DecisionPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionPort.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<SubjectRef> resolve(String username)"
+      ],
+      "name": "IdentityPort",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/IdentityPort.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<DecisionResult> decide(DecisionRequest request)"
+      ],
+      "name": "RiskDecisionClient",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/RiskDecisionClient.java"
+    },
+    {
+      "boundary": false,
+      "boundary_evidence": [],
+      "methods": [
+        "Mono<AccessDecision> check(AccessRequest request)"
+      ],
+      "name": "SecurityCenterClient",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/SecurityCenterClient.java"
+    }
+  ],
+  "repository": "exp-insurance",
+  "routes": [],
+  "schema": 1,
+  "settings": [
+    {
+      "default": "http://localhost:8085",
+      "key": "api-configuration.domain-platform.security-center.base-path",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainAccessConfiguration.java"
+    },
+    {
+      "default": "http://localhost:8042",
+      "key": "api-configuration.domain-platform.lending-credit-scoring.base-path",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/DomainDecisionConfiguration.java"
+    },
+    {
+      "default": "http://localhost:8073",
+      "key": "api-configuration.domain-platform.insurance-underwriting.base-path",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/HttpInsuranceConfiguration.java"
+    },
+    {
+      "default": "http://localhost:8071",
+      "key": "api-configuration.domain-platform.insurance-policies.base-path",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/HttpInsuranceConfiguration.java"
+    },
+    {
+      "default": "http://localhost:8072",
+      "key": "api-configuration.domain-platform.insurance-claims.base-path",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/adapter/HttpInsuranceConfiguration.java"
+    },
+    {
+      "default": "http://localhost:8080",
+      "key": "firefly.insurance.contracts-base-url",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/KitDocumentClientConfiguration.java"
+    },
+    {
+      "default": "8108",
+      "key": "SERVER_PORT",
+      "path": "exp-insurance-web/src/main/resources/application.yaml"
+    },
+    {
+      "default": "http://localhost:8085",
+      "key": "ENDPOINT_DOMAIN_CORE_SECURITY_CENTER",
+      "path": "exp-insurance-web/src/main/resources/application.yaml"
+    },
+    {
+      "default": "http://localhost:8042",
+      "key": "ENDPOINT_DOMAIN_LENDING_CREDIT_SCORING",
+      "path": "exp-insurance-web/src/main/resources/application.yaml"
+    },
+    {
+      "default": "http://localhost:8073",
+      "key": "ENDPOINT_DOMAIN_INSURANCE_UNDERWRITING",
+      "path": "exp-insurance-web/src/main/resources/application.yaml"
+    },
+    {
+      "default": "http://localhost:8071",
+      "key": "ENDPOINT_DOMAIN_INSURANCE_POLICIES",
+      "path": "exp-insurance-web/src/main/resources/application.yaml"
+    },
+    {
+      "default": "http://localhost:8072",
+      "key": "ENDPOINT_DOMAIN_INSURANCE_CLAIMS",
+      "path": "exp-insurance-web/src/main/resources/application.yaml"
+    }
+  ],
+  "test_cases": [
+    {
+      "name": "createSerializesPartyAndPolicyFieldsThroughTheActualGeneratedSdk",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpPolicyClientTest.java"
+    },
+    {
+      "name": "missingExplicitStatusUsesTheConfiguredDefaultInTheTypedRequest",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpPolicyClientTest.java"
+    },
+    {
+      "name": "create_callsUnderwritingSdk",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpUnderwritingClientTest.java"
+    },
+    {
+      "name": "createQuote_callsUnderwritingAfterDecision",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "createQuote_declineDoesNotCallUnderwriting",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "createQuote_deniedActorDoesNotCallDecisionOrDomain",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_approvedDecisionFailsBeforePolicyOrLegacyDocumentEffects",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_repeatedSubscriptionCannotCreateAnotherPolicy",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_declineStillPrecedesBindingAvailability",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_deniedAccessStillPrecedesBindingAvailability",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_disabledJourneyStillPrecedesBindingAvailability",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_referralDoesNotCreatePolicyOrDocument",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_missingOutcomeDoesNotCreatePolicyOrDocument",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_emptyDecisionDoesNotReturnAnEmptySuccess",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "bind_missingPartyDoesNotUseContractAsCustomerIdentity",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "registerClaim_declineDoesNotCallClaims",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "cancelPolicy_doesNotAskForADecision",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "closeClaim_doesNotAskForADecision",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java"
+    },
+    {
+      "name": "directBindReferralNeverEvaluatesTheDomainSupplier",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "approvedBindInvokesSupplierOnlyAfterSubscription",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "directBindMissingDecisionFailsUnavailable",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "directBindUnknownOutcomeFailsUnavailable",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "directBindDeclineKeepsExistingDeclineResult",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "bindEmptyCreditObservationDoesNotReturnEmptySuccess",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "preservesOtherOperationsExistingReferralBehavior",
+      "path": "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java"
+    },
+    {
+      "name": "start",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "stop",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "defaults",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "denied",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "approvedDecisionReturnsUnavailableBeforePolicyOrDocumentEffects",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "repeatedHttpRequestChecksCurrentAccessAndDecisionBeforeAnyEffect",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "referralReturnsConflictWithoutPolicyOrDocumentEffect",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "missingOutcomeReturnsUnavailableWithoutEffects",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "emptyDecisionReturnsUnavailableWithoutEffects",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "emptyCreditObservationReturnsUnavailableWithoutEffects",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "missingPartyReturnsBadRequestWithoutEffects",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    },
+    {
+      "name": "actualPublicContractDocumentsTheBindDecisionResults",
+      "path": "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java"
+    }
+  ],
+  "tests": [
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpPolicyClientTest.java",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/adapter/HttpUnderwritingClientTest.java",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceJourneyServiceTest.java",
+    "exp-insurance-core/src/test/java/io/fireflysoftware/experience/insurance/core/ports/InsuranceBindRiskStepTest.java",
+    "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/controllers/InsuranceBindDecisionHttpTest.java",
+    "exp-insurance-web/src/test/java/io/fireflysoftware/experience/insurance/web/openapi/OpenApiGenApplication.java"
+  ],
+  "types": [
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "tenantId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "policyId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "claimNumber",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "claimStatus",
+          "type": "ClaimStatus"
+        },
+        {
+          "constraints": [],
+          "name": "lossDate",
+          "type": "LocalDate"
+        },
+        {
+          "constraints": [],
+          "name": "notifiedAt",
+          "type": "Instant"
+        },
+        {
+          "constraints": [],
+          "name": "causeCode",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "currency",
+          "type": "String"
+        }
+      ],
+      "name": "ClaimCommand",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ClaimCommand.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "id",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "reference",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "documentId",
+          "type": "UUID"
+        }
+      ],
+      "name": "InsuranceRecord",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/InsuranceRecord.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "enabled",
+          "type": "EnumSet<InsuranceOperation>"
+        },
+        {
+          "constraints": [],
+          "name": "defaultSubmissionStatus",
+          "type": "SubmissionStatus"
+        },
+        {
+          "constraints": [],
+          "name": "defaultPolicyStatus",
+          "type": "PolicyStatus"
+        },
+        {
+          "constraints": [],
+          "name": "defaultClaimStatus",
+          "type": "ClaimStatus"
+        }
+      ],
+      "name": "JourneySettings",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/JourneySettings.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "tenantId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "contractId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "productId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "partyId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "policyNumber",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "lineOfBusiness",
+          "type": "LineOfBusiness"
+        },
+        {
+          "constraints": [],
+          "name": "policyStatus",
+          "type": "PolicyStatus"
+        },
+        {
+          "constraints": [],
+          "name": "inceptionDate",
+          "type": "LocalDate"
+        },
+        {
+          "constraints": [],
+          "name": "expiryDate",
+          "type": "LocalDate"
+        },
+        {
+          "constraints": [],
+          "name": "currency",
+          "type": "String"
+        }
+      ],
+      "name": "PolicyCommand",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/PolicyCommand.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "tenantId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "partyId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "productId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "submissionNumber",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "lineOfBusiness",
+          "type": "LineOfBusiness"
+        },
+        {
+          "constraints": [],
+          "name": "submissionStatus",
+          "type": "SubmissionStatus"
+        },
+        {
+          "constraints": [],
+          "name": "currency",
+          "type": "String"
+        }
+      ],
+      "name": "QuoteCommand",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/QuoteCommand.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "reason",
+          "type": "String"
+        }
+      ],
+      "name": "ReasonCommand",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/journey/ReasonCommand.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "allowed",
+          "type": "boolean"
+        },
+        {
+          "constraints": [],
+          "name": "reason",
+          "type": "String"
+        }
+      ],
+      "name": "AccessDecision",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessDecision.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "actorId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "action",
+          "type": "AccessAction"
+        },
+        {
+          "constraints": [],
+          "name": "resourceType",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "resourceId",
+          "type": "UUID"
+        }
+      ],
+      "name": "AccessRequest",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/AccessRequest.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "partyId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "productId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "journeyStep",
+          "type": "JourneyStep"
+        },
+        {
+          "constraints": [],
+          "name": "attributes",
+          "type": "String>"
+        }
+      ],
+      "name": "CreditReportQuery",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditReportQuery.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "provider",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "reportId",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "score",
+          "type": "Integer"
+        },
+        {
+          "constraints": [],
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "constraints": [],
+          "name": "illustrative",
+          "type": "boolean"
+        }
+      ],
+      "name": "CreditReportView",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/CreditReportView.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "partyId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "productId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "journeyStep",
+          "type": "JourneyStep"
+        },
+        {
+          "constraints": [],
+          "name": "attributes",
+          "type": "String>"
+        }
+      ],
+      "name": "DecisionRequest",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionRequest.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "outcome",
+          "type": "DecisionOutcome"
+        },
+        {
+          "constraints": [],
+          "name": "reasonCodes",
+          "type": "List<String>"
+        }
+      ],
+      "name": "DecisionResult",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/DecisionResult.java",
+      "persistent": false
+    },
+    {
+      "constraints": [],
+      "fields": [
+        {
+          "constraints": [],
+          "name": "actorId",
+          "type": "UUID"
+        },
+        {
+          "constraints": [],
+          "name": "provider",
+          "type": "String"
+        }
+      ],
+      "name": "SubjectRef",
+      "path": "exp-insurance-core/src/main/java/io/fireflysoftware/experience/insurance/core/ports/SubjectRef.java",
+      "persistent": false
+    }
+  ],
+  "verification_hazards": [],
+  "workflows": [
+    ".github/workflows/release.yml"
+  ]
+}
