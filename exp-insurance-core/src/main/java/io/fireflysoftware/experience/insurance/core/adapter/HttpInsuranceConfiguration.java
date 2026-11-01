@@ -21,6 +21,7 @@ import io.fireflysoftware.domain.insurance.claims.sdk.api.ClaimsApi;
 import io.fireflysoftware.domain.insurance.claims.sdk.model.ClaimDTO;
 import io.fireflysoftware.domain.insurance.policies.sdk.api.PoliciesApi;
 import io.fireflysoftware.domain.insurance.policies.sdk.model.PolicyDTO;
+import io.fireflysoftware.domain.insurance.policies.sdk.model.PolicyCreateRequest;
 import io.fireflysoftware.domain.insurance.underwriting.sdk.api.UnderwritingApi;
 import io.fireflysoftware.domain.insurance.underwriting.sdk.model.SubmissionDTO;
 import io.fireflysoftware.experience.insurance.core.journey.ClaimCommand;
@@ -172,7 +173,17 @@ public class HttpInsuranceConfiguration {
             require(command.inceptionDate(), "inceptionDate");
             PolicyStatus status = command.policyStatus() != null ? command.policyStatus() : defaultStatus;
             require(status, "policyStatus");
-            PolicyDTO body = policy(command, status);
+            PolicyCreateRequest body = new PolicyCreateRequest()
+                    .partyId(command.partyId())
+                    .tenantId(command.tenantId())
+                    .contractId(command.contractId())
+                    .productId(command.productId())
+                    .policyNumber(command.policyNumber())
+                    .lineOfBusiness(PolicyCreateRequest.LineOfBusinessEnum.fromValue(command.lineOfBusiness().name()))
+                    .policyStatus(PolicyCreateRequest.PolicyStatusEnum.fromValue(status.name()))
+                    .inceptionDate(command.inceptionDate())
+                    .expiryDate(command.expiryDate())
+                    .currency(command.currency());
             return policies.create(body, key()).map(HttpInsuranceConfiguration::policy);
         }
 

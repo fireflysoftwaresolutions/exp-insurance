@@ -26,14 +26,22 @@ import io.fireflysoftware.experience.insurance.core.journey.PolicyStatus;
 import io.fireflysoftware.experience.insurance.core.journey.QuoteCommand;
 import io.fireflysoftware.experience.insurance.core.journey.ReasonCommand;
 import io.fireflysoftware.experience.insurance.core.journey.SubmissionStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.fireflyframework.web.idempotency.annotation.DisableIdempotency;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -77,9 +85,22 @@ public class InsuranceController {
         return journey.withdrawQuote(submissionId, command.reason());
     }
 
+    @DisableIdempotency
     @PostMapping("/policies")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<InsuranceRecord> bind(@RequestBody PolicyCommand command) {
+    @Operation(summary = "Check insurance binding prerequisites",
+            description = "Binding is unavailable until authoritative quote acceptance and recoverable policy/document integration are connected")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Reserved legacy success schema; binding is currently unavailable",
+                    content = @Content(schema = @Schema(implementation = InsuranceRecord.class))),
+            @ApiResponse(responseCode = "400", description = "An explicit party identifier is required", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Referral requires an authorized resolution before binding", content = @Content),
+            @ApiResponse(responseCode = "422", description = "Configured decision declined the operation", content = @Content),
+            @ApiResponse(responseCode = "503", description = "Required decision is unavailable, or approved binding is fenced before policy and document effects", content = @Content)
+    })
+    public Mono<InsuranceRecord> bind(@RequestBody PolicyCommand command,
+            @Parameter(description = "Compatibility header; this route does not cache responses or derive authority from it.")
+            @RequestHeader(name = "X-Idempotency-Key", required = false) String ignoredIdempotencyKey) {
         return journey.bind(command);
     }
 

@@ -17,6 +17,8 @@
 
 package io.fireflysoftware.experience.insurance.core.ports;
 
+import org.fireflyframework.web.error.exceptions.BusinessException;
+import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Supplier;
@@ -36,29 +38,44 @@ public final class RiskStep {
                                           CreditReportQuery creditQuery,
                                           DecisionRequest decisionRequest,
                                           Supplier<Mono<T>> domainCall) {
-        return creditReportPort.request(creditQuery).flatMap(report -> {
+        Mono<CreditReportView> reports = creditReportPort.request(creditQuery);
+        if (decisionRequest.journeyStep() == JourneyStep.INSURANCE_BIND) {
+            reports = reports.switchIfEmpty(Mono.error(decisionUnavailable()));
+        }
+        return reports.flatMap(report -> {
             // Do not copy the score. The decision service expects a number and fills 640
             // from its own sandbox bureau when the caller omits creditScore.
             DecisionRequest enriched = decisionRequest
                     .withAttribute("creditProvider", report.provider())
                     .withAttribute("creditIllustrative", Boolean.toString(report.illustrative()));
-            return decisionPort.decide(enriched).flatMap(result -> {
-                if (result.outcome() == DecisionOutcome.DECLINE) {
-                    return Mono.error(new DecisionDeclinedException(result.reasonCodes()));
-                }
-                return domainCall.get();
-            });
+            return decisionThenDomain(decisionPort, enriched, domainCall);
         });
     }
 
     public static <T> Mono<T> decisionThenDomain(DecisionPort decisionPort,
                                                  DecisionRequest decisionRequest,
                                                  Supplier<Mono<T>> domainCall) {
-        return decisionPort.decide(decisionRequest).flatMap(result -> {
+        Mono<DecisionResult> decision = decisionPort.decide(decisionRequest);
+        if (decisionRequest.journeyStep() == JourneyStep.INSURANCE_BIND) {
+            decision = decision.switchIfEmpty(Mono.error(decisionUnavailable()));
+        }
+        return decision.flatMap(result -> {
             if (result.outcome() == DecisionOutcome.DECLINE) {
                 return Mono.error(new DecisionDeclinedException(result.reasonCodes()));
             }
-            return domainCall.get();
+            if (decisionRequest.journeyStep() == JourneyStep.INSURANCE_BIND
+                    && result.outcome() != DecisionOutcome.APPROVE) {
+                return Mono.error(result.outcome() == DecisionOutcome.REFER
+                        ? new BusinessException(HttpStatus.CONFLICT, "INSURANCE_REFERRAL_REQUIRED",
+                                "Insurance binding requires an authorized referral resolution")
+                        : decisionUnavailable());
+            }
+            return Mono.defer(domainCall);
         });
+    }
+
+    private static BusinessException decisionUnavailable() {
+        return new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "INSURANCE_DECISION_UNAVAILABLE",
+                "Insurance binding requires an explicit decision");
     }
 }
