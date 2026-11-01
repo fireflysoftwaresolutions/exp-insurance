@@ -83,7 +83,7 @@ class InsuranceBindDecisionHttpTest {
                 "--spring.config.location=optional:classpath:/insurance-bind-test-empty.yaml",
                 "--spring.application.name=insurance-bind-boundary",
                 "--server.port=0", "--server.address=127.0.0.1",
-                "--firefly.eda.enabled=false", "--firefly.web.idempotency.enabled=false",
+                "--firefly.eda.enabled=false", "--firefly.cache.enabled=false", "--firefly.cache.postgres.enabled=false", "--firefly.web.idempotency.enabled=false",
                 "--management.tracing.enabled=false", "--otel.sdk.disabled=true");
         int port = ((WebServerApplicationContext) context).getWebServer().getPort();
         client = WebClient.builder().baseUrl("http://127.0.0.1:" + port).build();

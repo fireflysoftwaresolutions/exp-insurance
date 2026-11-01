@@ -6,6 +6,30 @@ spring:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
 
+firefly:
+  cache:
+    enabled: true
+    redis:
+      enabled: false
+    default-cache-type: POSTGRES
+    postgres:
+      enabled: true
+      host: ${CACHE_DB_HOST:localhost}
+      port: ${CACHE_DB_PORT:5432}
+      database: ${CACHE_DB_NAME:}
+      username: ${CACHE_DB_USERNAME:}
+      password: ${CACHE_DB_PASSWORD:}
+      ssl-mode: ${CACHE_DB_SSL_MODE:verify-full}
+      schema: ${CACHE_DB_SCHEMA:firefly_insurance_experience_cache}
+      cache-table: cache_entries
+      auto-create-schema: false
+      min-pool-size: 1
+      max-pool-size: 2
+      connect-timeout: 5s
+      acquire-timeout: 5s
+      initialization-timeout: 15s
+      shutdown-timeout: 5s
+
 server:
   port: ${SERVER_PORT:8108}
 

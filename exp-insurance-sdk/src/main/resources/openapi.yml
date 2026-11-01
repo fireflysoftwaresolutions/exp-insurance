@@ -3,7 +3,7 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- url: http://localhost:18080
+- url: ""
   description: Generated server url
 paths:
   /api/v1/experience/insurance/quotes/{submissionId}:
@@ -291,6 +291,146 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/tenants/{tenantId}/submissions/{submissionId}/parties/{partyId}/products/{productId}/quote-offers:
+    get:
+      tags:
+      - GovernedInsuranceQuotes
+      summary: Read authorized quote history
+      operationId: readInsuranceQuoteHistory
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteHistoryResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
+    post:
+      tags:
+      - GovernedInsuranceQuotes
+      summary: Request an insurance quote offer through its domain
+      operationId: offerInsuranceQuote
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteOfferRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteCommandResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
+  ? /api/v1/experience/insurance/tenants/{tenantId}/submissions/{submissionId}/parties/{partyId}/products/{productId}/quote-offers/{offerId}/acceptances
+  : post:
+      tags:
+      - GovernedInsuranceQuotes
+      summary: Accept the exact existing quote terms
+      operationId: acceptInsuranceQuote
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: offerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteAcceptanceRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteCommandResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
   /api/v1/experience/insurance/quotes:
     post:
       tags:
@@ -426,6 +566,81 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/InsuranceRecord"
+  /api/v1/experience/insurance/governed/policies/{policyId}/issue:
+    post:
+      tags:
+      - GovernedInsurancePolicies
+      summary: Prepare then activate an existing bound sandbox policy through its
+        Domain
+      operationId: issueGovernedInsurancePolicy
+      parameters:
+      - name: policyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GovernedPolicyIssueRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernedPolicyCommandResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
+  /api/v1/experience/insurance/governed/policies/intents:
+    post:
+      tags:
+      - GovernedInsurancePolicies
+      summary: Observe the original Domain intent before its first mutation without
+        reserving or granting authority
+      operationId: prepareGovernedInsurancePolicyIntent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GovernedPolicyIntentRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernedPolicyPreparedIntent"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
+  /api/v1/experience/insurance/governed/policies/bindings:
+    post:
+      tags:
+      - GovernedInsurancePolicies
+      summary: Prepare the original policy intent then bind through its Domain
+      operationId: bindGovernedInsurancePolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GovernedPolicyBindRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernedPolicyCommandResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
   /api/v1/experience/insurance/claims:
     post:
       tags:
@@ -488,6 +703,133 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/InsuranceRecord"
+  ? /api/v1/experience/insurance/tenants/{tenantId}/submissions/{submissionId}/parties/{partyId}/products/{productId}/quote-offers/{offerId}
+  : get:
+      tags:
+      - GovernedInsuranceQuotes
+      summary: Read the currently authorized quote offer
+      operationId: readInsuranceQuoteOffer
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: offerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteReadResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
+  ? /api/v1/experience/insurance/tenants/{tenantId}/submissions/{submissionId}/parties/{partyId}/products/{productId}/quote-offers/actions/{actionId}/recovery
+  : get:
+      tags:
+      - GovernedInsuranceQuotes
+      summary: Observe an existing quote action without repeating its mutation
+      operationId: recoverInsuranceQuoteAction
+      parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: submissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: actionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: expectedIntentDigest
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteRecoveryResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
+  /api/v1/experience/insurance/governed/policies/recovery/{actionId}:
+    get:
+      tags:
+      - GovernedInsurancePolicies
+      summary: Observe the original Domain policy action without another mutation
+      operationId: recoverGovernedInsurancePolicyAction
+      parameters:
+      - name: actionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: intentDigest
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GovernedPolicyRecoveryResponse"
+      security:
+      - insuranceBearer: []
+      x-disable-idempotency: true
 components:
   schemas:
     QuoteCommand:
@@ -668,8 +1010,534 @@ components:
           - DENIED
         reason:
           type: string
+    QuoteOfferRequest:
+      required:
+      - actionId
+      - coverageEnd
+      - coverageStart
+      - expectedProductDigest
+      - expectedProductRevisionId
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        coverageStart:
+          type: string
+          format: date
+        coverageEnd:
+          type: string
+          format: date
+        expectedProductRevisionId:
+          type: string
+          format: uuid
+        expectedProductDigest:
+          type: string
+    QuoteActionEnvelope:
+      type: object
+      properties:
+        scope:
+          $ref: "#/components/schemas/QuoteOfferScope"
+        ownerIssuer:
+          type: string
+          nullable: true
+        ownerSubject:
+          type: string
+          nullable: true
+        operation:
+          anyOf:
+          - type: string
+            enum:
+            - OFFER
+            - ACCEPT
+          - type: object
+            nullable: true
+            enum:
+            - null
+        offerId:
+          type: string
+          format: uuid
+          nullable: true
+        offerVersion:
+          type: integer
+          format: int64
+          nullable: true
+        expectedControlGeneration:
+          type: integer
+          format: int64
+          nullable: true
+        actionId:
+          type: string
+          format: uuid
+          nullable: true
+        intentDigest:
+          type: string
+          nullable: true
+    QuoteCommandResponse:
+      required:
+      - actionId
+      - intentDigest
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - COMMITTED
+          - COMMITTED_RESPONSE_UNAVAILABLE
+          - OUTCOME_UNKNOWN
+          - REFUSED
+        actionId:
+          type: string
+          format: uuid
+        intentDigest:
+          type: string
+        result:
+          anyOf:
+          - $ref: "#/components/schemas/QuoteResultEnvelope"
+          - type: object
+            nullable: true
+            enum:
+            - null
+    QuoteOfferScope:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+        submissionId:
+          type: string
+          format: uuid
+          nullable: true
+        partyId:
+          type: string
+          format: uuid
+          nullable: true
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+    QuoteResultEnvelope:
+      type: object
+      properties:
+        action:
+          $ref: "#/components/schemas/QuoteActionEnvelope"
+        resultId:
+          type: string
+          format: uuid
+          nullable: true
+        offerVersionId:
+          type: string
+          format: uuid
+          nullable: true
+        acceptanceId:
+          type: string
+          format: uuid
+          nullable: true
+        recordedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resultingControlGeneration:
+          type: integer
+          format: int64
+          nullable: true
+    QuoteAcceptanceRequest:
+      required:
+      - actionId
+      - expectedControlGeneration
+      - offerVersion
+      - termsDigest
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        offerVersion:
+          type: integer
+          format: int64
+        expectedControlGeneration:
+          type: integer
+          format: int64
+        termsDigest:
+          type: string
     ReasonCommand:
       type: object
       properties:
         reason:
           type: string
+    GovernedPolicyIssueRequest:
+      required:
+      - actionId
+      - bindingReceiptDigest
+      - expectedBindingVersion
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        expectedBindingVersion:
+          type: integer
+          format: int64
+        bindingReceiptDigest:
+          type: string
+    GovernedPolicyBindingResult:
+      required:
+      - acceptanceActionId
+      - acceptanceId
+      - bindingReceiptDigest
+      - bindingVersion
+      - offerId
+      - offerVersion
+      - policyId
+      - policyNumber
+      - policyStatus
+      - termsDigest
+      type: object
+      properties:
+        policyId:
+          type: string
+          format: uuid
+        policyNumber:
+          type: string
+        policyStatus:
+          type: string
+          enum:
+          - BOUND
+          - IN_FORCE
+        bindingVersion:
+          type: integer
+          format: int64
+        bindingReceiptDigest:
+          type: string
+        acceptanceActionId:
+          type: string
+          format: uuid
+        acceptanceId:
+          type: string
+          format: uuid
+        offerId:
+          type: string
+          format: uuid
+        offerVersion:
+          type: integer
+          format: int64
+        termsDigest:
+          type: string
+    GovernedPolicyCommandResponse:
+      required:
+      - actionId
+      - intentDigest
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - COMMITTED
+          - COMMITTED_RESPONSE_UNAVAILABLE
+          - OUTCOME_UNKNOWN
+          - REFUSED
+        actionId:
+          type: string
+          format: uuid
+        intentDigest:
+          type: string
+        result:
+          $ref: "#/components/schemas/GovernedPolicyBindingResult"
+    GovernedPolicyBindRequest:
+      required:
+      - acceptanceActionId
+      - acceptanceIntentDigest
+      - acceptedControlGeneration
+      - actionId
+      - contractId
+      - expiryDate
+      - inceptionDate
+      - offerId
+      - offerVersion
+      - partyId
+      - policyNumber
+      - productId
+      - submissionId
+      - termsDigest
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        submissionId:
+          type: string
+          format: uuid
+        partyId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        offerId:
+          type: string
+          format: uuid
+        offerVersion:
+          type: integer
+          format: int64
+        acceptedControlGeneration:
+          type: integer
+          format: int64
+        acceptanceActionId:
+          type: string
+          format: uuid
+        acceptanceIntentDigest:
+          type: string
+        termsDigest:
+          type: string
+        contractId:
+          type: string
+          format: uuid
+        policyNumber:
+          type: string
+        inceptionDate:
+          type: string
+          format: date
+        expiryDate:
+          type: string
+          format: date
+    GovernedPolicyIntentRequest:
+      required:
+      - operation
+      type: object
+      properties:
+        operation:
+          type: string
+          enum:
+          - BIND
+          - ISSUE
+        bindRequest:
+          $ref: "#/components/schemas/GovernedPolicyBindRequest"
+        policyId:
+          type: string
+          format: uuid
+        issueRequest:
+          $ref: "#/components/schemas/GovernedPolicyIssueRequest"
+    GovernedPolicyPreparedIntent:
+      required:
+      - actionId
+      - intentDigest
+      - operation
+      type: object
+      properties:
+        operation:
+          type: string
+          enum:
+          - BIND
+          - ISSUE
+        actionId:
+          type: string
+          format: uuid
+        intentDigest:
+          type: string
+    Entry:
+      required:
+      - offer
+      - termsDigest
+      type: object
+      properties:
+        offer:
+          $ref: "#/components/schemas/QuoteOfferVersion"
+        termsDigest:
+          type: string
+        receipt:
+          anyOf:
+          - $ref: "#/components/schemas/QuoteAcceptanceReceipt"
+          - type: object
+            nullable: true
+            enum:
+            - null
+    QuoteAcceptanceIntent:
+      type: object
+      properties:
+        scope:
+          $ref: "#/components/schemas/QuoteOfferScope"
+        offerId:
+          type: string
+          format: uuid
+          nullable: true
+        offerVersion:
+          type: integer
+          format: int64
+          nullable: true
+        expectedControlGeneration:
+          type: integer
+          format: int64
+          nullable: true
+        termsDigest:
+          type: string
+          nullable: true
+        actionId:
+          type: string
+          format: uuid
+          nullable: true
+    QuoteAcceptanceReceipt:
+      type: object
+      properties:
+        intent:
+          $ref: "#/components/schemas/QuoteAcceptanceIntent"
+        acceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resultingControlGeneration:
+          type: integer
+          format: int64
+          nullable: true
+    QuoteHistoryResponse:
+      required:
+      - entries
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/Entry"
+    QuoteOfferTerms:
+      type: object
+      properties:
+        currency:
+          type: string
+          nullable: true
+        basePremium:
+          type: number
+          nullable: true
+        tax:
+          type: number
+          nullable: true
+        fees:
+          type: number
+          nullable: true
+        coverageTerms:
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+        productRevisionId:
+          type: string
+          format: uuid
+          nullable: true
+        productDigest:
+          type: string
+          nullable: true
+        riskDigest:
+          type: string
+          nullable: true
+        providerVersion:
+          type: string
+          nullable: true
+        ruleSetVersion:
+          type: string
+          nullable: true
+    QuoteOfferVersion:
+      type: object
+      properties:
+        scope:
+          $ref: "#/components/schemas/QuoteOfferScope"
+        offerId:
+          type: string
+          format: uuid
+          nullable: true
+        offerVersion:
+          type: integer
+          format: int64
+          nullable: true
+        controlGeneration:
+          type: integer
+          format: int64
+          nullable: true
+        state:
+          anyOf:
+          - type: string
+            enum:
+            - OFFERED
+            - ACCEPTED
+            - WITHDRAWN
+          - type: object
+            nullable: true
+            enum:
+            - null
+        terms:
+          $ref: "#/components/schemas/QuoteOfferTerms"
+        issuedAt:
+          type: string
+          format: date-time
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+    QuoteReadResponse:
+      required:
+      - state
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - FOUND
+          - NOT_OBSERVED_AT_THIS_READ
+        entry:
+          anyOf:
+          - $ref: "#/components/schemas/Entry"
+          - type: object
+            nullable: true
+            enum:
+            - null
+    QuoteRecoveryResponse:
+      required:
+      - actionId
+      - intentDigest
+      - state
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - FOUND
+          - NOT_OBSERVED_AT_THIS_READ
+          - INTENT_CONFLICT
+        actionId:
+          type: string
+          format: uuid
+        intentDigest:
+          type: string
+        result:
+          anyOf:
+          - $ref: "#/components/schemas/QuoteResultEnvelope"
+          - type: object
+            nullable: true
+            enum:
+            - null
+    GovernedPolicyRecoveryResponse:
+      required:
+      - actionId
+      - intentDigest
+      - state
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - FOUND
+          - NOT_OBSERVED_AT_THIS_READ
+          - INTENT_CONFLICT
+        actionId:
+          type: string
+          format: uuid
+        intentDigest:
+          type: string
+        result:
+          $ref: "#/components/schemas/GovernedPolicyBindingResult"
+  securitySchemes:
+    insuranceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
