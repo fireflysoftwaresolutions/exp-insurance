@@ -79,7 +79,7 @@ public class DomainDecisionConfiguration {
                             .journeyStep(io.fireflysoftware.domain.lending.creditscoring.sdk.model.DecisionRequest.JourneyStepEnum
                                     .fromValue(request.journeyStep().name()))
                             .attributes(new java.util.HashMap<>(request.attributes()));
-            return decisions.evaluateDecision(body, null)
+            return decisions.evaluateDecision(body)
                     .map(view -> new DecisionResult(
                             DecisionOutcome.valueOf(outcome(view)),
                             view.getReasonCodes() == null ? java.util.List.of() : view.getReasonCodes()));
